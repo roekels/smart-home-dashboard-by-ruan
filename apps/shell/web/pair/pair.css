@@ -1,0 +1,2 @@
+/* The wall tablet's pairing page (kiosk host). Adds the code to the sign-in page's look. */
+.pair__code { margin-top: 22px; font: 600 40px/1.1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .06em; font-variant-numeric: tabular-nums; }

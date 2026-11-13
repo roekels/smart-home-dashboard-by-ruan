@@ -41,7 +41,7 @@ This is a one-time copy. Your private repository is yours to change and extend; 
 | Home Assistant | lights, scenes, plugs and lists | Home Assistant with the Cloudflared add-on |
 | Energy | an energy page from your Home Assistant sensors | Home Assistant |
 | Kiosk | wall tablets, paired from Settings | Home Assistant |
-| Edge agents | stats from your Mac or Windows computers | a computer, a Go build |
+| Edge agents | stats from your Mac, Windows or Linux computers | a computer, a Go build |
 | Alfred | a chat assistant inside the dashboard | an Anthropic API key, billed per use |
 
 ## Your secrets

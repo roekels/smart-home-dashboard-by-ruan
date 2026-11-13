@@ -31,6 +31,8 @@ export interface Me {
   nav: { group: string; items: NavItem[] }[];
   manage: ManageItem[];
   demo: boolean;
+  /** True on a paired wall tablet (the kiosk host): one page, no menus, no person. */
+  kiosk?: boolean;
 }
 
 /** Who is signed in and what they may open (GET /api/me), filled once before the first paint.
@@ -66,10 +68,24 @@ export interface HealthMine {
   follow_ups: { id: string; date: string; what: string; follow_up: string }[];
 }
 
+export interface EnergyDevice { entity: string; name: string; w: number | null; plug?: string; on?: boolean }
+export interface EnergySample { solar: number | null; home: number | null; grid: number | null; battery: number | null; level: number | null }
+export interface EnergyDay { date: string; solar: number; home: number; imported: number; exported: number }
+/** Watts now (grid: + buying, - feeding in; battery: + charging), kWh for the days, 10-minute averages for the chart. */
+export interface EnergyNow {
+  configured: boolean; ts: number | null; fresh: boolean; error: string | null;
+  now: EnergySample & { devices: EnergyDevice[]; other: number | null };
+  today: EnergyDay | null; yesterday: EnergyDay | null;
+  series: ({ t: number } & EnergySample)[];
+}
+
 export const api = {
   calendar: (from: string, to: string) => call<{ events: CalendarEvent[] }>("GET", `/calendar?from=${from}&to=${to}`),
   home: () => call<HomeControls>("GET", "/ha"),
   runScene: (scene: string) => call<{ ok: boolean }>("POST", "/ha/scene", { scene }),
+  setLight: (entity: string | string[], on: boolean, brightness?: number) => call<{ ok: boolean }>("POST", "/ha/light", brightness === undefined ? { entity, on } : { entity, on, brightness }),
+  setPlug: (entity: string, on: boolean) => call<{ ok: boolean }>("POST", "/ha/switch", { entity, on }),
+  energy: () => call<EnergyNow>("GET", "/energy"),
   lists: () => call<{ lists: TodoList[] }>("GET", "/lists"),
   addListItem: (list: string, text: string) => call<{ ok: boolean }>("POST", "/lists/add", { list, text }),
   setListItem: (list: string, item: string, done: boolean) => call<{ ok: boolean }>("POST", "/lists/done", { list, item, done }),
