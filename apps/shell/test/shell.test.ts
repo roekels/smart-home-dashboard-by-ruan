@@ -30,7 +30,9 @@ test("pages: what is public, what is behind the sign-in, what does not exist", (
   assert.equal(pageAccess("/login/login.css", H), "public");
   assert.equal(pageAccess("/login/../dist/main.js", H), "none");
   for (const p of ["/home", "/home/", "/settings", "/dashboard/security", "/api/me", "/dist/main.js", "/styles/app.css", "/favicon.svg"]) assert.equal(pageAccess(p, H), "private", p);
-  for (const p of ["/nope", "/home/calendar", "/dashboard", "/dist/../secret", "/.env"]) assert.equal(pageAccess(p, H), "none", p);
+  assert.equal(pageAccess("/home/calendar", H), "private", "calendar is on in this household");
+  assert.equal(pageAccess("/home/calendar", parseHousehold(example)), "none", "and off in the example");
+  for (const p of ["/nope", "/home/controls", "/dashboard", "/dist/../secret", "/.env"]) assert.equal(pageAccess(p, H), "none", p);
   assert.equal(isAsset("/dist/../x"), false);
 });
 
@@ -127,7 +129,8 @@ test("worker: signed in (wrangler dev stand-in), members and admins", async () =
   assert.equal(r.status, 200);
   assert.equal((await get("/nope", asAlex)).status, 404);
   assert.equal((await get("/brain/mcp", asAlex)).status, 404);
-  assert.equal((await get("/api/calendar", asAlex)).status, 404, "no module answers: not found");
+  assert.equal((await get("/api/ha", asAlex)).status, 404, "no module answers: not found");
+  assert.equal((await get("/api/calendar?from=2031-06-01&to=2031-06-02", asAlex)).status, 503, "calendar is on, its Worker is not bound");
   assert.equal((await get("/api/anything", asAlex, { method: "POST" })).status, 403, "a write without our header");
   assert.equal((await get("/home", asAlex, { method: "POST" })).status, 405);
   assert.equal((await get("/api/me", env({ DEV_EMAIL: "stranger@example.com" }))).status, 401, "signed in at Access but not in the household");
