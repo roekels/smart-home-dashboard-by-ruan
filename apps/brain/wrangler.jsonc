@@ -23,7 +23,7 @@
     }
   ],
   "vars": {
-    "HOUSEHOLD": "{\"household\":\"Example family\",\"domain\":\"home.example.com\",\"resourcePrefix\":\"home\",\"language\":\"en\",\"timezone\":\"Europe/London\",\"currency\":\"GBP\",\"people\":[{\"id\":\"alex\",\"name\":\"Alex\",\"email\":\"alex@example.com\",\"admin\":true},{\"id\":\"sam\",\"name\":\"Sam\",\"email\":\"sam@example.com\",\"admin\":false}],\"modules\":{\"brain\":true,\"calendar\":false,\"finance\":false,\"health\":false,\"dataExport\":true,\"homeAssistant\":false,\"energy\":false,\"kiosk\":false,\"edgeAgents\":false,\"alfred\":false},\"hosts\":{}}",
+    "HOUSEHOLD": "{\"household\":\"Example family\",\"domain\":\"home.example.com\",\"resourcePrefix\":\"home\",\"language\":\"en\",\"timezone\":\"Europe/London\",\"currency\":\"GBP\",\"people\":[{\"id\":\"alex\",\"name\":\"Alex\",\"email\":\"alex@example.com\",\"admin\":true},{\"id\":\"sam\",\"name\":\"Sam\",\"email\":\"sam@example.com\",\"admin\":false}],\"modules\":{\"brain\":true,\"calendar\":false,\"finance\":false,\"health\":false,\"dataExport\":false,\"homeAssistant\":false,\"energy\":false,\"kiosk\":false,\"edgeAgents\":false,\"alfred\":false},\"hosts\":{}}",
     "ACCESS_TEAM": "your-team",
     "ACCESS_AUD": "0000000000000000000000000000000000000000000000000000000000000000",
     "BRAIN_SHARED_ROOT": "Family"

@@ -15,7 +15,7 @@
     "calendar": false,
     "finance": false,
     "health": false,
-    "dataExport": true,
+    "dataExport": false,
     "homeAssistant": false,
     "energy": false,
     "kiosk": false,
