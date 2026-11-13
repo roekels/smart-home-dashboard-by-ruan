@@ -1,0 +1,19 @@
+name: checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - run: npm run check
+        env:
+          # Optional repo secret: newline-separated terms that must never appear in this repo.
+          SCRUB_DENYLIST_TERMS: ${{ secrets.SCRUB_DENYLIST_TERMS }}

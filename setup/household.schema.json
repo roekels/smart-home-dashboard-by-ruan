@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Household config",
+  "description": "The one file with a household's own settings. Copy household.config.example.json to household.config.json. No secrets go in here.",
+  "type": "object",
+  "required": ["household", "domain", "people", "modules"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "household": { "type": "string", "minLength": 1, "description": "Shown in the dashboard's title." },
+    "domain": { "type": "string", "pattern": "^[a-z0-9.-]+\\.[a-z]{2,}$", "description": "The dashboard's hostname. Its zone must be active on Cloudflare." },
+    "resourcePrefix": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,15}$", "default": "home", "description": "Prefix of every Worker, database and bucket name." },
+    "language": { "type": "string", "default": "en" },
+    "timezone": { "type": "string", "description": "IANA time zone, e.g. Europe/London." },
+    "people": {
+      "type": "array", "minItems": 1, "maxItems": 6,
+      "items": {
+        "type": "object", "required": ["id", "name", "email"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,23}$" },
+          "name": { "type": "string", "minLength": 1, "description": "First name only." },
+          "email": { "type": "string", "format": "email", "description": "The address this person signs in with." },
+          "admin": { "type": "boolean", "default": false, "description": "Admins see Metrics and Settings > management. At least one person must be admin." }
+        }
+      }
+    },
+    "modules": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "brain": { "type": "boolean" },
+        "calendar": { "type": "boolean" },
+        "finance": { "type": "boolean" },
+        "health": { "type": "boolean" },
+        "dataExport": { "type": "boolean" },
+        "homeAssistant": { "type": "boolean" },
+        "energy": { "type": "boolean", "description": "Needs homeAssistant." },
+        "kiosk": { "type": "boolean", "description": "Needs homeAssistant." },
+        "edgeAgents": { "type": "boolean" },
+        "alfred": { "type": "boolean", "description": "Needs a paid Anthropic API key." }
+      }
+    }
+  }
+}

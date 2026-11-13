@@ -1,0 +1,13 @@
+{
+  "name": "smart-home-dashboard",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "check": "npm run check:manifest && npm run check:scrub",
+    "check:manifest": "node setup/check-manifest.mjs",
+    "check:scrub": "node setup/scrub-check.mjs",
+    "test": "node --test"
+  }
+}
