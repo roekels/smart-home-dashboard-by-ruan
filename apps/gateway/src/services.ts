@@ -66,8 +66,32 @@ const FINANCE: ServiceDef = {
   }),
 };
 
-/** One entry per module MCP. Other modules (home, devices) add theirs here. */
-export const MODULE_SERVICES: ServiceDef[] = [FINANCE, HEALTH];
+/** One entry per module MCP. */
+export const MODULE_SERVICES: ServiceDef[] = [
+  FINANCE, HEALTH,
+  {
+    module: "homeAssistant", path: "/home/mcp",
+    build: () => ({
+      id: "home", title: "the house (Home Assistant)", path: "/home/mcp", prefix: "home.",
+      scopes: {
+        "home.read": "See the lights, scenes and plugs, and the energy picture if there is one",
+        "home.control": "Switch lights and run scenes",
+        "home.lists": "Read the shopping and to-do lists you may see, add items and tick them off",
+        "home.plugs": "Switch smart plugs on and off (this cuts power to what hangs on them)",
+      },
+    }),
+  },
+  {
+    module: "edgeAgents", path: "/devices/mcp",
+    build: () => ({
+      id: "devices", title: "the computers", path: "/devices/mcp", prefix: "devices.",
+      scopes: {
+        "devices.read": "See the computers, their numbers and the results of commands",
+        "devices.control": "Propose commands for a computer; risky ones wait for an admin to confirm in the dashboard",
+      },
+    }),
+  },
+];
 
 export const SERVICE_DEFS: ServiceDef[] = [CORE, ...MODULE_SERVICES];
 

@@ -1,5 +1,6 @@
 import type { FinanceApi } from "../../../modules/finance/src/contract.ts";
 import type { HealthApi } from "../../../modules/health/src/contract.ts";
+import type { DevicesApi, HomeApi } from "./tools/home.ts";
 
 export interface Env {
   /** <prefix>-shell, entrypoint Finance: the sealed finance records behind /finance/mcp. Unset while the module is off. */
@@ -16,6 +17,10 @@ export interface Env {
   ACCESS_TEAM: string;
   /** AUD of the Access app in front of /oauth/authorize. Comma-separated if more than one app covers it. */
   ACCESS_AUD: string;
+  /** Service binding to <prefix>-shell, entrypoint Home: the house behind /home/mcp. Present when Home Assistant is on. */
+  HOME?: HomeApi;
+  /** Service binding to <prefix>-shell, entrypoint Devices: the computers behind /devices/mcp. Present when edge agents are on. */
+  DEVICES?: DevicesApi;
   /** wrangler dev only (git-ignored .dev.vars): the base address, e.g. http://localhost:8788. In the cloud it is https://<domain>. */
   DEV_PUBLIC_URL?: string;
   /** wrangler dev only (git-ignored .dev.vars): act as this email on the consent page. Never set in the cloud. */

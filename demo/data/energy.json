@@ -1,0 +1,29 @@
+{
+  "$comment": "A made-up house for the Energy page: solar panels, a battery and a few metered devices. share = the part of the house's draw a device takes.",
+  "peakSolarW": 4200,
+  "baseLoadW": 380,
+  "peakLoadW": 1500,
+  "batteryMaxW": 2500,
+  "config": {
+    "solar": ["sensor.roof_solar_power"],
+    "grid": "sensor.grid_meter_power",
+    "battery": "sensor.home_battery_power",
+    "batteryLevel": "sensor.home_battery_charge"
+  },
+  "sensors": [
+    { "entity": "sensor.roof_solar_power", "name": "Roof Solar Power" },
+    { "entity": "sensor.grid_meter_power", "name": "Grid Meter Power" },
+    { "entity": "sensor.home_battery_power", "name": "Home Battery Power" }
+  ],
+  "levels": [
+    { "entity": "sensor.home_battery_charge", "name": "Home Battery Charge" }
+  ],
+  "devices": [
+    { "sensor": "sensor.heat_pump_power", "name": "Heat Pump", "share": 0.34 },
+    { "sensor": "sensor.office_desk_power", "name": "Office Desk", "share": 0.12, "plug": "switch.office_desk" },
+    { "sensor": "sensor.fridge_power", "name": "Fridge", "share": 0.09 },
+    { "sensor": "sensor.washing_machine_power", "name": "Washing Machine", "share": 0.08 },
+    { "sensor": "sensor.air_filter_power", "name": "Air Filter", "share": 0.05, "plug": "switch.air_filter" },
+    { "sensor": "sensor.tv_power", "name": "TV", "share": 0.04 }
+  ]
+}

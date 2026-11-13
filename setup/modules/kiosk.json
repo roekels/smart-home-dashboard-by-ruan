@@ -1,0 +1,22 @@
+{
+  "module": "kiosk",
+  "hosts": [
+    {
+      "key": "kiosk",
+      "label": "kiosk",
+      "use": "customDomain",
+      "app": "shell",
+      "var": {
+        "app": "shell",
+        "name": "KIOSK_HOST"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "Wall tablet page asks for a sign-in on the dashboard",
+      "path": "/kiosk",
+      "expectAccessLogin": true
+    }
+  ]
+}

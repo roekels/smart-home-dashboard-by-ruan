@@ -68,7 +68,13 @@ async function api(req: Request, env: Env, url: URL, h: Household, person: Perso
   if (p === "/api/setup/keys") {
     return keyPageApi({ req, person, write, manifest: manifest.secrets as ManifestSecret[], passText: demo ? undefined : env.SETUP_KEYPAGE_WRITE_TOKEN });
   }
-  if (demo) return demoApi(req, url, person, write);
+  if (demo) {
+    for (const m of builtModules(h)) {
+      const r = await m.demo?.({ req, env, url, household: h, person, write });
+      if (r) return r;
+    }
+    return demoApi(req, url, person, write);
+  }
   if (req.method !== "GET" && req.method !== "HEAD" && !write) throw new HttpError(403, "cross-site write refused");
   const segment = p.split("/")[2] ?? "";
   for (const m of builtModules(h)) {
@@ -91,6 +97,12 @@ export async function route(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url);
   const h = isDemo(env) ? DEMO_HOUSEHOLD : householdFromVar(env.HOUSEHOLD);
   const path = url.pathname;
+
+  // callers that are not people (a paired wall tablet, an edge agent) prove themselves to their own module
+  for (const m of builtModules(h)) {
+    const r = await m.machine?.({ req, env, url, household: h, demo: isDemo(env) });
+    if (r) return r;
+  }
 
   const access = pageAccess(path, h);
   if (access === "redirect") return Response.redirect(`${url.origin}/home`, 302);
@@ -118,14 +130,16 @@ export default {
       return json({ error: "internal error" }, 500);
     }
   },
-  /** The daily cron: each module that is on does its housekeeping (modules.ts `scheduled`). Never in demo mode. */
-  async scheduled(_event: ScheduledController, env: Env): Promise<void> {
+
+  /** One cron tick: every module that is on and listens to this trigger gets a turn (modules.ts `scheduled`, `cron`).
+   *  One failing never stops the others. Never in demo mode. */
+  async scheduled(c: ScheduledController, env: Env): Promise<void> {
     if (isDemo(env)) return;
-    const h = householdFromVar(env.HOUSEHOLD);
+    const h = householdFromVar(env.HOUSEHOLD), now = new Date(c.scheduledTime);
     for (const m of builtModules(h)) {
-      if (!m.scheduled) continue;
+      if (!m.scheduled || (m.cron && m.cron !== c.cron)) continue;
       // the module's name only: an error message could carry data
-      await m.scheduled(env, h).catch(() => console.error(`scheduled: ${m.id} failed`));
+      await m.scheduled(env, h, now).catch(() => console.error(`scheduled: ${m.id} failed`));
     }
   },
 } satisfies ExportedHandler<Env>;

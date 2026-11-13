@@ -1,0 +1,15 @@
+{
+  "module": "energy",
+  "shell": {
+    "crons": [
+      "* * * * *"
+    ]
+  },
+  "checks": [
+    {
+      "name": "Energy page asks for a sign-in",
+      "path": "/home/energy",
+      "expectAccessLogin": true
+    }
+  ]
+}

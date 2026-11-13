@@ -1,25 +1,139 @@
 {
   "$comment": "Made-up Home Assistant controls: scenes, lights and plugs.",
   "scenes": [
-    { "entity": "scene.living_room_evening", "name": "Living Room Evening" },
-    { "entity": "scene.living_room_daylight", "name": "Living Room Daylight" },
-    { "entity": "scene.movie_time", "name": "Movie Time" },
-    { "entity": "scene.good_night", "name": "Good Night" }
+    {
+      "entity": "scene.living_room_evening",
+      "name": "Living Room Evening"
+    },
+    {
+      "entity": "scene.living_room_daylight",
+      "name": "Living Room Daylight"
+    },
+    {
+      "entity": "scene.movie_time",
+      "name": "Movie Time"
+    },
+    {
+      "entity": "scene.good_night",
+      "name": "Good Night"
+    }
   ],
   "lights": [
-    { "entity": "light.living_room_ceiling", "name": "Living Room Ceiling", "on": true, "brightness": 70, "color": "#ffd9a8" },
-    { "entity": "light.living_room_floor_lamp", "name": "Living Room Floor Lamp", "on": true, "brightness": 40, "color": "#ff9a4d" },
-    { "entity": "light.living_room_shelf", "name": "Living Room Shelf", "on": false },
-    { "entity": "light.kitchen_ceiling", "name": "Kitchen Ceiling", "on": true, "brightness": 100, "color": "#f3f1ff" },
-    { "entity": "light.kitchen_counter", "name": "Kitchen Counter", "on": false },
-    { "entity": "light.hallway_ceiling", "name": "Hallway Ceiling", "on": false },
-    { "entity": "light.bedroom_ceiling", "name": "Bedroom Ceiling", "on": false },
-    { "entity": "light.bedroom_bedside", "name": "Bedroom Bedside", "on": false },
-    { "entity": "light.garden_string_lights", "name": "Garden String Lights", "on": true, "brightness": 55, "color": "#7a5cff" },
-    { "entity": "light.garden_wall", "name": "Garden Wall", "on": false, "unavailable": true }
+    {
+      "entity": "light.living_room_ceiling",
+      "name": "Living Room Ceiling",
+      "on": true,
+      "brightness": 70,
+      "color": "#ffd9a8"
+    },
+    {
+      "entity": "light.living_room_floor_lamp",
+      "name": "Living Room Floor Lamp",
+      "on": true,
+      "brightness": 40,
+      "color": "#ff9a4d"
+    },
+    {
+      "entity": "light.living_room_shelf",
+      "name": "Living Room Shelf",
+      "on": false
+    },
+    {
+      "entity": "light.kitchen_ceiling",
+      "name": "Kitchen Ceiling",
+      "on": true,
+      "brightness": 100,
+      "color": "#f3f1ff"
+    },
+    {
+      "entity": "light.kitchen_counter",
+      "name": "Kitchen Counter",
+      "on": false
+    },
+    {
+      "entity": "light.hallway_ceiling",
+      "name": "Hallway Ceiling",
+      "on": false
+    },
+    {
+      "entity": "light.bedroom_ceiling",
+      "name": "Bedroom Ceiling",
+      "on": false
+    },
+    {
+      "entity": "light.bedroom_bedside",
+      "name": "Bedroom Bedside",
+      "on": false
+    },
+    {
+      "entity": "light.garden_string_lights",
+      "name": "Garden String Lights",
+      "on": true,
+      "brightness": 55,
+      "color": "#7a5cff"
+    },
+    {
+      "entity": "light.garden_wall",
+      "name": "Garden Wall",
+      "on": false,
+      "unavailable": true
+    }
   ],
   "plugs": [
-    { "entity": "switch.office_desk", "name": "Office Desk", "on": true },
-    { "entity": "switch.air_filter", "name": "Air Filter", "on": false }
-  ]
+    {
+      "entity": "switch.office_desk",
+      "name": "Office Desk",
+      "on": true
+    },
+    {
+      "entity": "switch.air_filter",
+      "name": "Air Filter",
+      "on": false
+    }
+  ],
+  "setup": {
+    "$comment": "What the Home Assistant setup page offers in the demo.",
+    "lists": [
+      {
+        "entity": "todo.shopping_list",
+        "name": "Shopping list",
+        "owner": "shared"
+      },
+      {
+        "entity": "todo.alex",
+        "name": "Alex's to-dos",
+        "owner": "alex"
+      },
+      {
+        "entity": "todo.sam",
+        "name": "Sam's to-dos",
+        "owner": "sam"
+      },
+      {
+        "entity": "todo.robin",
+        "name": "Robin's to-dos",
+        "owner": "robin"
+      }
+    ],
+    "otherSwitches": [
+      {
+        "entity": "switch.dishwasher_child_lock",
+        "name": "Dishwasher Child Lock"
+      },
+      {
+        "entity": "switch.router_guest_wifi",
+        "name": "Router Guest Wi-Fi"
+      }
+    ],
+    "scripts": [
+      {
+        "entity": "script.sweet_dreams",
+        "name": "Sweet Dreams"
+      },
+      {
+        "entity": "script.water_the_garden",
+        "name": "Water The Garden"
+      }
+    ]
+  }
 }

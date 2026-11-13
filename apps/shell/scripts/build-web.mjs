@@ -21,4 +21,6 @@ cpSync(join(web, "login", "login.css"), join(out, "login", "login.css"));
 cpSync(join(web, "login", "mark.svg"), join(out, "login", "mark.svg"));
 cpSync(join(web, "icons", "mark-180.png"), join(out, "login", "icon-180.png"));
 cpSync(join(web, "fonts", "Geist-Variable.woff2"), join(out, "login", "Geist-Variable.woff2"));
+// the wall tablet's pairing page (modules/kiosk): its script and style, public on the kiosk host only
+cpSync(join(web, "pair"), join(out, "pair"), { recursive: true });
 console.log(`UI built into ${out}`);

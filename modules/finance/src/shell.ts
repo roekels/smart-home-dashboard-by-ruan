@@ -11,6 +11,7 @@ export const financeModule: ShellModule = {
   pages: [{ path: "/dashboard/finance", label: "Finance", icon: "wallet", where: "metrics" }],
   api: { finance: (c) => financeRoute(c.req, c.url, c.env, c.household, c.person, c.write) },
   // once a day: the European Central Bank's reference rates for the currencies in use (public data)
+  cron: "20 4 * * *", // as in setup/modules/finance.json: the dashboard has other, more frequent triggers too
   scheduled: async (env, h) => {
     if (env.FINANCE_DB) await syncRates(env.FINANCE_DB, localDate(h.timezone), h.currency);
   },
