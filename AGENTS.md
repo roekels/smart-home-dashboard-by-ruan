@@ -3,6 +3,11 @@
 You are helping a person who is not a developer. Do the work yourself, explain in plain words, and stop where this
 guide says stop. Applies to any AI (Claude, Codex or other).
 
+The person's own guide is [docs/getting-started.md](docs/getting-started.md): it covers the accounts, the domain, the
+token and its permissions, and the clicks below, in the same order. When they are stuck on a click, send them to the
+matching section there rather than writing your own instructions. Each module's page for them is in
+[docs/modules/](docs/modules/README.md).
+
 ## Rules that always hold
 
 1. **Secrets never appear in chat, in the repository, in commit messages or in logs.** Read them from your
@@ -22,10 +27,11 @@ guide says stop. Applies to any AI (Claude, Codex or other).
 - A GitHub account and a Cloudflare account.
 - A domain whose zone is active on Cloudflare.
 - A private copy of this repository that you can read and write.
-- A Cloudflare API token that expires within 7 days, stored as the environment secret
-  `SETUP_CLOUDFLARE_FULL_TOKEN`.
+- A Cloudflare API token that expires within 7 days, with the permissions listed in
+  [docs/getting-started.md, step 6](docs/getting-started.md#step-6-the-7-day-cloudflare-token), stored in your
+  environment as `SETUP_CLOUDFLARE_FULL_TOKEN`.
 
-If any of these is missing, explain how to do it and stop.
+If any of these is missing, send them to the matching step of the guide and stop.
 
 ## Setup, step by step
 
@@ -39,12 +45,12 @@ If any of these is missing, explain how to do it and stop.
 | 3. Plan preview | `node setup/provision.mjs --dry-run`: prints every Worker, database, bucket, Access application, hostname and secret, and every change it would make | wait for a yes |
 | 4. Provision | `node setup/provision.mjs`: creates the stores and Access applications, writes `setup/resources.json` and the wrangler configs; safe to run again. Commit the changed files | none |
 | 5. Deploy | `node setup/deploy.mjs --dry-run`, then without: installs, applies database migrations and deploys each Worker | stop on the first fail |
-| 6. Secrets | `node setup/secrets.mjs --dry-run`, then without: makes the machine-made secrets and sets them on the Workers. It prints the names the person still has to enter; give them that as one checklist | wait until they confirm each is stored in their password manager |
+| 6. Secrets | `node setup/secrets.mjs --dry-run`, then without: makes the machine-made secrets and sets them on the Workers. It prints the names the person still has to enter; give them that as one checklist, with the module page that says how to make each and [docs/secrets.md](docs/secrets.md) for putting it into Cloudflare | wait until they confirm each is stored in their password manager |
 | 7. Key page | `node setup/keys.mjs open` (dry run first), then send the admin to `/setup/keys` on their dashboard. They make the keys there, save them in their password manager and press the button. Then `node setup/keys.mjs close` | wait until `close` reports every key stored. Never ask to see a key |
 | 8. Verify | `node setup/verify.mjs`: checks the live dashboard from outside | fix or explain every fail |
 | 9. Clicks only the person can do | the list below | wait until each is done |
 | 10. Token handover | ask the person to delete the full token in Cloudflare and to remove `SETUP_CLOUDFLARE_FULL_TOKEN` from your environment, then run `node setup/handover.mjs` | do not finish while it reports that the full token still works |
-| 11. Connect their AI app | give them the MCP addresses to add in Claude or ChatGPT | none |
+| 11. Connect their AI app | give them the MCP addresses of their modules and [docs/using-your-dashboard.md](docs/using-your-dashboard.md#connecting-claude-or-chatgpt) | none |
 | 12. Hand over | write `docs/your-setup.md` in their repository: what exists, with names only | none |
 
 The key page needs the setup token to be allowed to create other tokens (permission "API Tokens: Edit"). If
@@ -77,5 +83,7 @@ household, then run it without `--dry-run`.
 - A new computer for the edge agents: the person makes a service token in Cloudflare (Zero Trust, Service
   credentials) named `<prefix>-agent-<machine>` and keeps both halves in their password manager. Then run
   `node setup/provision.mjs`, which lets that token, and no other, through to the machines' path.
-- A new secret needs a manifest entry first, named `<MODULE>_<WHAT>_<KIND>`.
+- A new secret needs a manifest entry first, named `<MODULE>_<WHAT>_<KIND>`, and a row in `docs/secrets.md`.
+- When you change what a module does or needs from the person, update its page in `docs/modules/` too. Screenshots
+  in `docs/screenshots/` come from demo mode only (`npm run demo`), never from the person's own dashboard.
 - Health and finance data are never logged, never written to notes, and never sent to another service.

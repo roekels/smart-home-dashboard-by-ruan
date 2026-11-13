@@ -40,8 +40,8 @@ service token. Three things need your hands, once:
 1. In Home Assistant, install the **Cloudflared** add-on and give it the tunnel hostname the setup names.
 2. In Home Assistant, create a user for the dashboard (not an administrator), sign in as that user, and under
    Security create a **long-lived access token**. Keep a copy in your password manager as `HA_API_LONGLIVED_TOKEN`.
-3. Give that token to the dashboard Worker as a secret (your AI gives you the one command; you paste the value
-   into your own terminal, never into the chat).
+3. Put that token on the dashboard Worker as a secret yourself, in the Cloudflare dashboard
+   ([docs/secrets.md](../../docs/secrets.md#putting-a-secret-into-cloudflare-yourself)), never into the chat.
 
 Then open Settings > Home Assistant: five green ticks mean it works. Assign the lists and tick your plugs.
 
