@@ -9,6 +9,7 @@ import type { Env } from "./env.ts";
 import type { SecurityPart } from "./security.ts";
 import { financeModule } from "../../../modules/finance/src/shell.ts";
 import { healthModule } from "../../../modules/health/src/shell.ts";
+import { calendarModule } from "../../calendar/shell.ts";
 import { alfredModule } from "../../alfred/shell.ts";
 
 /** Where a page shows up: the Home menu, the Metrics menu, or the Management list on Settings. */
@@ -50,7 +51,7 @@ export interface ShellModule {
 }
 
 /** Modules built into this Worker. A module that is on in the config but missing here is simply not there yet. */
-export const MODULES: ShellModule[] = [financeModule, healthModule, alfredModule];
+export const MODULES: ShellModule[] = [calendarModule, financeModule, healthModule, alfredModule];
 
 export const builtModules = (h: Household, modules: ShellModule[] = MODULES): ShellModule[] =>
   modules.filter((m) => h.modules[m.id]);

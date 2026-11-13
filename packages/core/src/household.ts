@@ -84,6 +84,7 @@ export function householdProblems(input: unknown): string[] {
       if (!isObj(p)) return void out.push(`${at}: must be an object`);
       for (const k of Object.keys(p)) if (!["id", "name", "email", "admin"].includes(k)) out.push(`${at}: unknown setting "${k}"`);
       if (typeof p.id !== "string" || !PERSON_ID.test(p.id)) out.push(`${at}.id: lower-case letters, digits and hyphens, starting with a letter`);
+      else if (p.id === "shared" || p.id === "joint") out.push(`${at}.id: "${p.id}" is taken (it names what everyone shares); use the person's first name`);
       else if (ids.has(p.id)) out.push(`${at}.id: "${p.id}" is used twice`);
       else ids.add(p.id);
       if (typeof p.name !== "string" || !p.name.trim() || p.name.length > 40) out.push(`${at}.name: a first name is required`);

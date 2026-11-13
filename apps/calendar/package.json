@@ -1,0 +1,21 @@
+{
+  "name": "calendar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The optional calendar Worker: the household's iCloud calendars over CalDAV. The only holder of the iCloud app password; reachable over service bindings only.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc -p . --noEmit",
+    "test": "node --test",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "ical.js": "^2.2.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261031.1",
+    "typescript": "^6.0.2",
+    "wrangler": "^4.156.0"
+  }
+}
