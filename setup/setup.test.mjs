@@ -55,6 +55,7 @@ function fakeCloudflare(over = {}) {
     if ((m = path.match(`^${a}/r2/buckets/([^/]+)$`)) && method === "DELETE") { state.r2 = state.r2.filter((b) => b.name !== m[1]); return ok(null); }
     if (path === `${a}/access/apps`) { if (method === "GET") return ok(state.apps); const app = { ...body, id: id(8), aud: id(64) }; state.apps.push(app); state.policies[app.id] = []; return ok(app); }
     if ((m = path.match(`^${a}/access/apps/([^/]+)/policies$`))) { if (method === "GET") return ok(state.policies[m[1]] ?? []); const p = { ...body, id: id(8) }; state.policies[m[1]].push(p); return ok(p); }
+    if ((m = path.match(`^${a}/access/apps/([^/]+)/policies/([^/]+)$`)) && method === "DELETE") { state.policies[m[1]] = state.policies[m[1]].filter((p) => p.id !== m[2]); return ok(null); }
     if ((m = path.match(`^${a}/access/apps/([^/]+)/policies/([^/]+)$`)) && method === "PUT") { Object.assign(state.policies[m[1]].find((p) => p.id === m[2]), body); return ok(body); }
     if ((m = path.match(`^${a}/access/apps/([^/]+)$`))) { if (method === "PUT") { Object.assign(state.apps.find((x) => x.id === m[1]), body); return ok(body); } state.apps = state.apps.filter((x) => x.id !== m[1]); return ok(null); }
     if (path === `${a}/access/service_tokens`) { if (method === "GET") return ok(state.tokens); const t = { id: id(8), name: body.name, client_id: `${id(32)}.access`, client_secret: "made-" + id(8) }; state.tokens.push(t); return ok(t); }
@@ -218,7 +219,7 @@ test("provision: a new person in the config updates the sign-in policy, nothing 
   const first = await provision({ cf: f.cf(), config });
   const more = { ...config, people: [...config.people, { id: "kit", name: "Kit", email: "kit@example.com" }] };
   const { actions } = await provision({ cf: f.cf(), config: more, resources: first.resources });
-  assert.deepEqual(actions.filter((a) => !a.startsWith("reuse")), ['  update policy "Household members"']);
+  assert.deepEqual(actions.filter((a) => !a.startsWith("reuse")), ['  update policy "Household members" on maple-family']);
   const family = f.state.apps.find((a) => a.name === "maple-family");
   assert.equal(f.state.policies[family.id][0].include.length, 3);
 });
@@ -244,6 +245,7 @@ test("deploy: a database is migrated before its Worker; a Worker follows the one
 
 test("machine secrets: made, set on the right Worker, never reported; a second run keeps them", async () => {
   const f = fakeCloudflare();
+  await provision({ cf: f.cf(), config: withLamp, moduleFiles: files });
   const resources = { accountId: ACCOUNT, d1: { gateway: "11111111-0000-4000-8000-000000000001" } }; // scrub-check: allow (test fixture)
   const manifest = read("secrets.manifest.json");
   const run = () => machineSecretsFor({ cf: f.cf(), plan: buildPlan(withLamp, files), resources, manifest, makeKey: (n) => `hmcp_${n}_fixed`, now: () => "2026-01-10T00:00:00.000Z" });
@@ -258,7 +260,7 @@ test("machine secrets: made, set on the right Worker, never reported; a second r
   const writes = f.calls.filter((c) => c.method !== "GET").length;
   const second = await run();
   assert.equal(f.calls.filter((c) => c.method !== "GET").length, writes);
-  assert.ok(second.actions.every((a) => a.startsWith("keep")));
+  assert.ok(second.actions.filter((a) => !a.startsWith("  ")).every((a) => a.startsWith("keep")));
 });
 
 test("verify: status checks and the sign-in redirect", async () => {
@@ -343,4 +345,40 @@ test("plan: {person} in a gateway key's scope becomes one scope per person", () 
   const ids = plan.household.people.map((p) => p.id);
   assert.ok(ids.length >= 2);
   assert.deepEqual(plan.gatewayKeys[0].scopes, ["household.read", ...ids.map((id) => `cal.${id}.read`), "cal.shared.read"]);
+});
+
+test("machine doors: a policy names the exact service tokens, and there is none until one exists", async () => {
+  const f = fakeCloudflare();
+  const withAud = { ...lamp, serviceAuthPaths: [{ path: "/api/agents/*", audVar: { app: "shell", name: "AGENTS_ACCESS_AUD" } }] };
+  const mods = { core, homeAssistant: withAud };
+  const policyOf = (name) => f.state.policies[f.state.apps.find((a) => a.name === name).id];
+  const first = await provision({ cf: f.cf(), config: withLamp, moduleFiles: mods });
+  assert.deepEqual(policyOf("maple-homeassistant-tunnel"), [], "no token yet: Access lets nobody through");
+  assert.deepEqual(policyOf("maple-homeassistant-machines"), []);
+  assert.ok(first.actions.some((a) => /closed to everyone until its service token exists/.test(a)));
+  assert.match(first.resources.aud["path:/api/agents/*"], /^[0-9a-f]{64}$/);
+
+  // the setup's own token opens the tunnel and only the tunnel
+  await machineSecretsFor({ cf: f.cf(), plan: buildPlan(withLamp, mods), resources: { ...first.resources, d1: { gateway: "x" } }, manifest: read("secrets.manifest.json") });
+  const tunnel = f.state.tokens.find((t) => t.name === "maple-ha-tunnel");
+  assert.deepEqual(policyOf("maple-homeassistant-tunnel").map((p) => [p.decision, p.include]), [["non_identity", [{ service_token: { token_id: tunnel.id } }]]]);
+  assert.deepEqual(policyOf("maple-homeassistant-machines"), [], "the tunnel's token does not open the machines' path");
+
+  // a machine's own token, made by the person under the agreed name, is added on the next run; another token is not
+  f.state.tokens.push({ id: "m1", name: "maple-agent-studio" }, { id: "o1", name: "someone-elses-token" });
+  await provision({ cf: f.cf(), config: withLamp, moduleFiles: mods, resources: first.resources });
+  assert.deepEqual(policyOf("maple-homeassistant-machines")[0].include, [{ service_token: { token_id: "m1" } }]);
+  assert.equal(policyOf("maple-homeassistant-tunnel")[0].include.length, 1);
+
+  // the Worker that checks the door gets its AUD tag as a var
+  const shell = JSON.parse(render({ config: withLamp, resources: { ...first.resources, accessAud: "b".repeat(64) } }, mods)["apps/shell/wrangler.jsonc"].split("\n").filter((l) => !l.startsWith("//")).join("\n"));
+  assert.equal(shell.vars.AGENTS_ACCESS_AUD, first.resources.aud["path:/api/agents/*"]);
+
+  // a token that is deleted loses its way in; teardown removes the machines' tokens too
+  f.state.tokens = f.state.tokens.filter((t) => t.id !== "m1");
+  await provision({ cf: f.cf(), config: withLamp, moduleFiles: mods, resources: first.resources });
+  assert.deepEqual(policyOf("maple-homeassistant-machines"), []);
+  f.state.tokens.push({ id: "m2", name: "maple-agent-den" });
+  await teardown({ cf: f.cf(), config: withLamp, moduleFiles: mods });
+  assert.deepEqual(f.state.tokens.map((t) => t.name), ["someone-elses-token"]);
 });

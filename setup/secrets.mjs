@@ -12,6 +12,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { client } from "./lib/cloudflare.mjs";
 import { buildPlan } from "./lib/plan.mjs";
+import { syncPolicy } from "./lib/access.mjs";
 import { flag, loadConfig, loadResources, run } from "./lib/io.mjs";
 import { resourceName } from "../packages/core/src/household.ts";
 
@@ -51,6 +52,17 @@ export async function machineSecretsFor({ cf, plan, resources, manifest = JSON.p
     await put(t.app, t.idSecret, made.client_id ?? "dry-run");
     await put(t.app, t.keySecret, made.client_secret ?? "dry-run");
     actions.push(`${old ? "renew" : "create"} service token ${t.fullName} and set ${t.idSecret}, ${t.keySecret} on ${resourceName(h, t.app)} (valid one year)`);
+  }
+
+  // A new token must be named in its application's policy before it opens anything.
+  if (plan.serviceTokens.length) {
+    const now = cf.dryRun ? tokens : await cf.list(`${acct}/access/service_tokens`);
+    const apps = await cf.list(`${acct}/access/apps`);
+    for (const a of plan.access.filter((x) => x.tokens)) {
+      const app = apps.find((x) => x.name === a.name);
+      if (!app) { actions.push(`  ${a.name} does not exist yet. Run setup/provision.mjs, then this again.`); continue; }
+      await syncPolicy({ cf, acct, app, a, tokens: now, actions });
+    }
   }
 
   for (const k of plan.gatewayKeys) {

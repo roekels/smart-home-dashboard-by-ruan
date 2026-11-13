@@ -8,6 +8,7 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { client } from "./lib/cloudflare.mjs";
 import { accessTeam, existing, findZone } from "./lib/account.mjs";
+import { syncPolicy } from "./lib/access.mjs";
 import { buildPlan, describePlan } from "./lib/plan.mjs";
 import { flag, loadConfig, loadResources, ROOT, run, saveResources } from "./lib/io.mjs";
 import { render } from "./wrangler-config.mjs";
@@ -15,8 +16,8 @@ import { render } from "./wrangler-config.mjs";
 const SESSION = "24h";
 
 /** Applies the plan. Returns { resources, actions }: the ids for setup/resources.json and what was done, in words. */
-export async function provision({ cf, config, resources = {} }) {
-  const plan = buildPlan(config);
+export async function provision({ cf, config, resources = {}, moduleFiles }) {
+  const plan = buildPlan(config, moduleFiles);
   const actions = [];
   const domain = plan.household.domain;
   const found = await findZone(cf, domain);
@@ -50,6 +51,7 @@ export async function provision({ cf, config, resources = {} }) {
     else { await cf.post(`${acct}/r2/buckets`, { name: b.name }); actions.push(`create bucket ${b.name}`); }
   }
 
+  const tokens = plan.access.some((a) => a.tokens) ? await cf.list(`${acct}/access/service_tokens`) : [];
   for (const a of plan.access) {
     if (!a.domains.length) continue;
     const body = { name: a.name, type: "self_hosted", domain: a.domains[0], self_hosted_domains: a.domains, session_duration: SESSION, app_launcher_visible: a.key === "family" };
@@ -62,17 +64,8 @@ export async function provision({ cf, config, resources = {} }) {
       actions.push(`update the paths of Access application ${a.name}`);
     } else actions.push(`reuse Access application ${a.name}`);
     if (a.saveAud) out.accessAud = app.aud;
-
-    // One policy per application, replaced when the people in the config changed.
-    const policies = app.id === "dry-run" ? [] : await cf.list(`${acct}/access/apps/${app.id}/policies`);
-    const mine = policies.find((p) => p.name === a.policy.name);
-    const want = { name: a.policy.name, decision: a.policy.decision, include: a.policy.include };
-    if (!mine) { await cf.post(`${acct}/access/apps/${app.id}/policies`, want); actions.push(`  add policy "${a.policy.name}" (${a.policy.decision})`); }
-    else if (JSON.stringify(mine.include) !== JSON.stringify(a.policy.include) || mine.decision !== a.policy.decision) {
-      await cf.put(`${acct}/access/apps/${app.id}/policies/${mine.id}`, want);
-      actions.push(`  update policy "${a.policy.name}"`);
-    }
-    for (const p of policies.filter((p) => p.name !== a.policy.name)) actions.push(`  note: policy "${p.name}" was not made by this setup and was left alone`);
+    if (a.audVar) (out.aud ??= {})[a.key] = app.aud;
+    await syncPolicy({ cf, acct, app, a, tokens, actions });
   }
   return { plan, resources: out, actions };
 }
