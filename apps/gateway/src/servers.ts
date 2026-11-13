@@ -1,0 +1,30 @@
+// One MCP server builder per service id. services.ts says which services exist; this says what each one does.
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { Household } from "../../../packages/core/src/household.ts";
+import type { Env, Principal } from "./env.ts";
+import type { Service } from "./services.ts";
+import { audit } from "./util.ts";
+import { buildHouseholdServer } from "./tools/household.ts";
+
+export interface ServerCtx {
+  env: Env;
+  ctx: Pick<ExecutionContext, "waitUntil">;
+  /** The caller, with scopes already cut to this service. */
+  principal: Principal;
+  h: Household;
+  service: Service;
+  /** Every MCP of this household, and the base address they share. */
+  services: Service[];
+  base: string;
+}
+
+export type ServerBuilder = (c: ServerCtx) => McpServer;
+
+/** Later phases add one line per module MCP, keyed by the service id from services.ts. */
+export const SERVERS: Record<string, ServerBuilder> = {
+  household: (c) =>
+    buildHouseholdServer(c.principal, {
+      h: c.h, services: c.services, base: c.base,
+      log: (tool, ok, detail) => void audit(c.env, c.ctx, { service: c.service.id, actor: c.principal.actor, via: c.principal.via, tool, ok, detail }),
+    }),
+};

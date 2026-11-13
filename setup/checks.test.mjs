@@ -19,6 +19,11 @@ test("scrub: real-looking data fails", () => {
   assert.deepEqual(rules("team myteam.cloudflareaccess.com"), ["access-team"]); // scrub-check: allow (test fixture)
 });
 
+test("scrub: all-zero placeholders pass, gateway keys fail", () => {
+  assert.deepEqual(rules(`"id": "${"0".repeat(32)}", "aud": "${"0".repeat(64)}", "db": "00000000-0000-0000-0000-000000000000"`), []);
+  assert.deepEqual(rules("Bearer hmcp_alfred_" + "Ab3".repeat(10)), ["api-key"]);
+});
+
 test("scrub: deny list hits never echo the term", () => {
   const found = scanText("the Smiths live here", ["smith"]);
   assert.equal(found.length, 1);

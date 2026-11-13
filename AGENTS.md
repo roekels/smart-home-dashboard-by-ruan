@@ -50,7 +50,12 @@ household, then run it without `--dry-run`.
 ## Working in this repository afterwards
 
 - A merge to `main` deploys, through Cloudflare Workers Builds. To undo a change, revert the merge.
-- Run `npm test` and `npm run check` before every push.
+- Run `npm run install:apps` once, then `npm run typecheck`, `npm test` and `npm run check` before every push.
 - Household settings go in `household.config.json` only. Do not hard-code names, emails or domains in code.
+- Each `wrangler.jsonc` is generated. After changing `household.config.json` or `setup/resources.json` (the ids of
+  the Cloudflare resources, none of them secret), run `node setup/wrangler-config.mjs` and commit the result.
+- A module plugs in at fixed places: `apps/shell/src/modules.ts` and `apps/shell/web/src/modules.ts` for its pages
+  and API, `apps/gateway/src/services.ts` and `servers.ts` for its MCP. See the README in each folder.
+- Never set `DEMO_MODE` on the person's own dashboard. It is for `npm run demo` and screenshots only.
 - A new secret needs a manifest entry first, named `<MODULE>_<WHAT>_<KIND>`.
 - Health and finance data are never logged, never written to notes, and never sent to another service.

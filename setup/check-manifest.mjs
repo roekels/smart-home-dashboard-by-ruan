@@ -3,6 +3,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { householdProblems } from "../packages/core/src/household.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const KINDS = ["KEY", "TOKEN", "PASSWORD", "PASSPHRASE", "ID"];
@@ -58,9 +59,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const manifest = JSON.parse(readFileSync(join(ROOT, "secrets.manifest.json"), "utf8"));
   const errors = checkManifest(manifest);
   for (const u of undeclared(manifest, [...sources(join(ROOT, "apps")), ...sources(join(ROOT, "modules"))])) errors.push(`code reads a secret the manifest does not list: ${u}`);
-  const config = JSON.parse(readFileSync(join(ROOT, "household.config.example.json"), "utf8"));
-  if (!config.people?.some((p) => p.admin)) errors.push("example config: at least one person must be admin");
-  if ((config.people?.length ?? 0) > 6) errors.push("example config: at most 6 people");
+  for (const file of ["household.config.example.json", "demo/household.config.json", "household.config.json"]) {
+    let config;
+    try { config = JSON.parse(readFileSync(join(ROOT, file), "utf8")); } catch (e) { if (e.code === "ENOENT" && file === "household.config.json") continue; errors.push(`${file}: ${e.message}`); continue; }
+    for (const p of householdProblems(config)) errors.push(`${file}: ${p}`);
+  }
   if (errors.length) { console.error(errors.join("\n")); process.exit(1); }
   console.log(`manifest ok: ${manifest.secrets.length} secrets`);
 }
