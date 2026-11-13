@@ -89,7 +89,9 @@ all driven by these files, so a module is installed only when its file exists **
   "serviceTokens": [{ "name": "ha-tunnel", "for": "host:homeAssistant", "app": "shell", "idSecret": "HA_TUNNEL_SERVICE_TOKEN_ID", "keySecret": "HA_TUNNEL_SERVICE_TOKEN_KEY" }],
 
   // Paths on the dashboard's domain that programs call. publicPaths get no sign-in page (the Worker checks tokens
-  // itself); serviceAuthPaths need a Cloudflare Access service token.
+  // itself); serviceAuthPaths need a Cloudflare Access service token. An entry is a path, or
+  // { "path": "/api/agents/*", "audVar": { "app": "shell", "name": "AGENTS_ACCESS_AUD" } } to also give that Worker
+  // the application's AUD tag as a var, so it can check the Access token itself.
   "publicPaths": ["/brain/mcp*"],
   "serviceAuthPaths": [],
 
@@ -112,4 +114,11 @@ Rules:
 - Several modules may add to the same shell store: declare the store in one module file and bind it from the
   others' `shell` block by its short name.
 - Ids of the created stores land in `setup/resources.json` as `d1.<name>` and `kv.<name>`.
+- A binding name is declared once per Worker. A module that needs another module's store (and cannot run without
+  that module) uses its binding and does not declare it again.
+- An Access application for machines names the exact service tokens that may pass, never "any valid token": the
+  tokens a module file's `serviceTokens` point at it, and for a `serviceAuthPaths` application also every token
+  named `<prefix>-agent-<machine>`. Until one exists the application has no policy and nobody gets through.
+  A machine's token is made by the person in Cloudflare (Zero Trust, Service credentials) under that name, so its
+  value never passes through the AI; `node setup/provision.mjs` then adds it to the policy.
 - A check passes on `expectStatus`, or on `expectAccessLogin: true` (a redirect to the Cloudflare Access sign-in).

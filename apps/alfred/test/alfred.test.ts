@@ -24,6 +24,7 @@ const BASE = "https://home.example.com";
 // ---------- made-up MCPs behind a made-up gateway ----------
 
 const writes: unknown[] = [];
+const reads: [string, any][] = [];
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s }] });
 
 function brainServer() {
@@ -37,8 +38,8 @@ function brainServer() {
 }
 function calendarServer() {
   const s = new McpServer({ name: "calendar", version: "test" });
-  s.registerTool("list_events", { description: "List events", inputSchema: { from: z.string(), to: z.string() }, annotations: { readOnlyHint: true } },
-    async () => text("(Dinner with friends) Thursday 19:00"));
+  s.registerTool("list_events", { description: "List events", inputSchema: { from: z.string(), to: z.string(), calendars: z.array(z.string()).optional() }, annotations: { readOnlyHint: true } },
+    async (a) => { reads.push(["calendar", a]); return text("(Dinner with friends) Thursday 19:00"); });
   return s;
 }
 function homeServer() {
@@ -231,6 +232,24 @@ test("scope: the speaker by default, another person only for an admin who asked 
   assert.equal(r2.ok, false);
   assert.match((r2 as any).reason, /only reach their own/);
   assert.equal(scopeCall(H, robin, health, {}, []).ok, true);
+});
+
+test("scope: calendars are the speaker's own and the shared one, for admins too", () => {
+  const list = { server: "calendar", inputSchema: { type: "object", properties: { from: {}, to: {}, calendars: { type: "array" } } } };
+  const one = { server: "calendar", inputSchema: { type: "object", properties: { calendar: { type: "string" }, title: {} } } };
+  // nothing named: own and shared are filled in
+  assert.deepEqual(scopeCall(H, robin, list, { from: "a", to: "b" }, []), { ok: true, input: { from: "a", to: "b", calendars: ["robin", "shared"] }, other: null });
+  // a wider list is cut down; only someone else's is refused, by name
+  assert.deepEqual((scopeCall(H, robin, list, { calendars: ["alex", "Robin", "shared"] }, []) as any).input.calendars, ["robin", "shared"]);
+  const r = scopeCall(H, alex, list, { calendars: ["robin"] }, ["show me Robin's calendar"]);
+  assert.equal(r.ok, false);
+  assert.match((r as any).reason, /Robin's calendar is not open here/);
+  // a single calendar: own and shared pass, another person's does not, whatever the model quotes
+  assert.equal(scopeCall(H, robin, one, { calendar: "shared", title: "Picnic" }, []).ok, true);
+  assert.equal(scopeCall(H, robin, one, { calendar: "robin", title: "Dentist" }, []).ok, true);
+  assert.equal(scopeCall(H, alex, one, { calendar: "robin", title: "x", other_person_request: "add it to Robin's calendar" }, ["add it to Robin's calendar"]).ok, false);
+  // a tool that takes no calendar is left alone
+  assert.deepEqual(scopeCall(H, robin, { server: "calendar", inputSchema: { type: "object", properties: {} } }, {}, []), { ok: true, input: {}, other: null });
 });
 
 test("scope: finance is for admins; another owner needs the quote, joint does not", () => {
@@ -492,6 +511,24 @@ test("finance: another owner needs the quote; a joint row just needs the card", 
   const cards = c.events.filter((e) => e.type === "confirm") as any[];
   assert.deepEqual(cards.map((x) => x.id), ["tu_2"]);
   assert.equal(writes.length, 0);
+});
+
+test("calendar: both the up-front fetch and the model's own call see only the speaker's and the shared calendar", async () => {
+  reads.length = 0;
+  const store = memStore(), p = pool({ "/calendar/mcp": calendarServer }, robin);
+  const client = claude([
+    use(["tu_a", "calendar__list_events", { from: "2026-03-01", to: "2026-03-08", calendars: ["alex"] }]),
+    use(["tu_b", "calendar__list_events", { from: "2026-03-01", to: "2026-03-08", calendars: ["alex", "robin"] }]),
+    say("Thursday there is dinner with friends."),
+  ]);
+  const r = await runTurn({ client, tools: p, store, budget, config: cfg({ speaker: robin, autoContext: true }) }, msg("what is on this week?"), () => {});
+  await p.close();
+  assert.equal(r.status, "complete");
+  // fetched up front for Robin; Alex's alone was refused before it reached the calendar; the mixed list was cut
+  assert.deepEqual(reads.map(([, a]) => a.calendars), [["robin", "shared"], ["robin"]]);
+  const refused = store.msgs.flatMap((m) => m.content).find((c: any) => c.type === "tool_result" && c.tool_use_id === "tu_a");
+  assert.equal(refused.is_error, true);
+  assert.match(refused.content, /Alex's calendar is not open here/);
 });
 
 // ---------- auto-context ----------

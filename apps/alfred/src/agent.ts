@@ -175,7 +175,12 @@ async function turn(deps: TurnDeps, input: TurnInput, emit: Emit, trace: Trace, 
     // What the message most likely needs, fetched before the first model call. Its own block, before the person's
     // words, so the page can show the conversation without it.
     if (config.autoContext !== false) {
-      const ctx = await autoContext(input.text, (s, n, a) => tools.call(s, n, a), (q) => byName.get(q)?.mode === "auto", emit, {
+      const ctx = await autoContext(input.text, (s, n, a) => {
+        // the same person rules as a call the model makes (scope.ts): the calendar fetched up front is the speaker's
+        const scoped = scopeCall(h, speaker, { server: s, inputSchema: byName.get(`${s}__${n}`)?.inputSchema }, a, []);
+        if (!scoped.ok) throw new Error(scoped.reason);
+        return tools.call(s, n, scoped.input);
+      }, (q) => byName.get(q)?.mode === "auto", emit, {
         timezone: h.timezone, previous: lastAsk(store.history()), brainOnly: input.skill === "brain_note",
         timed: (source, ms, ok) => trace.context.push({ source, ms, ok }),
       }).catch((e) => { console.error("auto-context failed", e); return ""; });
@@ -294,7 +299,7 @@ async function turn(deps: TurnDeps, input: TurnInput, emit: Emit, trace: Trace, 
         results.set(u.id, { type: "tool_result", tool_use_id: u.id, is_error: true, content: `Unknown or disabled tool: ${u.name}` });
         return;
       }
-      // whose records is this? (finance and health only; scope.ts)
+      // whose records or calendar is this? (scope.ts)
       const scoped = scopeCall(h, speaker, t, raw, said);
       if (!scoped.ok) {
         results.set(u.id, { type: "tool_result", tool_use_id: u.id, is_error: true, content: scoped.reason });
