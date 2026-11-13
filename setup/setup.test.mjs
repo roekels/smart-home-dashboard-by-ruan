@@ -336,3 +336,11 @@ test("handover: passes only when the full token is gone", async () => {
   f.state.token = null;
   assert.equal((await handover({ token: "test-token", fetch: f.fetch })).gone, true);
 });
+
+test("plan: {person} in a gateway key's scope becomes one scope per person", () => {
+  const perPerson = { ...lamp, gatewayKeys: [{ ...lamp.gatewayKeys[0], scopes: ["household.read", "cal.{person}.read", "cal.shared.read"] }] };
+  const plan = buildPlan(withLamp, { core, homeAssistant: perPerson });
+  const ids = plan.household.people.map((p) => p.id);
+  assert.ok(ids.length >= 2);
+  assert.deepEqual(plan.gatewayKeys[0].scopes, ["household.read", ...ids.map((id) => `cal.${id}.read`), "cal.shared.read"]);
+});

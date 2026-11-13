@@ -124,7 +124,11 @@ export function buildPlan(config, moduleFiles = loadModuleFiles(), secretNames) 
       if (host.var) { const w = worker(host.var.app); if (w) w.vars[host.var.name] = host.var.asUrl ? `https://${name}` : name; }
     }
     for (const s of m.secrets ?? []) plan.secrets.push({ module: m.module, ...s });
-    for (const k of m.gatewayKeys ?? []) plan.gatewayKeys.push({ module: m.module, ...k });
+    // "{person}" in a scope stands for each person of the household: "cal.{person}.read" becomes one scope per person id.
+    for (const k of m.gatewayKeys ?? []) {
+      const scopes = [...new Set((k.scopes ?? []).flatMap((s) => (s.includes("{person}") ? h.people.map((p) => s.replaceAll("{person}", p.id)) : [s])))];
+      plan.gatewayKeys.push({ module: m.module, ...k, scopes });
+    }
     for (const t of m.serviceTokens ?? []) plan.serviceTokens.push({ module: m.module, ...t, fullName: resourceName(h, t.name) });
     publicPaths.push(...(m.publicPaths ?? []));
     for (const p of m.serviceAuthPaths ?? []) servicePaths.push({ module: m.module, path: p });
