@@ -3,17 +3,19 @@ import { renderShell, bindKeys, applyTheme, savedTheme, deviceMode } from "./she
 import { today, todayInit, stopToday } from "./pages/today.ts";
 import { settings, settingsInit } from "./pages/settings.ts";
 import { security, securityInit, securityLeave } from "./pages/security.ts";
+import { setupKeys, setupKeysInit, setupKeysLeave } from "./pages/setup-keys.ts";
 import { UI_MODULES, type Page } from "./modules.ts";
 import { bindRouter, current } from "./routes.ts";
 import { ApiError, loadWho, who } from "./api.ts";
 import { t } from "./i18n.ts";
 
-// One page per path. The shell's own three, then whatever the modules bring (modules.ts).
+// One page per path. The shell's own four, then whatever the modules bring (modules.ts).
 // leave() runs before the next page renders.
 const pages: Record<string, Page> = {
   "/home": { title: "Today", view: today, init: todayInit, leave: stopToday },
   "/settings": { title: "Settings", view: settings, init: settingsInit },
   "/dashboard/security": { title: "Security", view: security, init: securityInit, leave: securityLeave },
+  "/setup/keys": { title: "Encryption keys", view: setupKeys, init: setupKeysInit, leave: setupKeysLeave },
 };
 for (const m of UI_MODULES) Object.assign(pages, m.pages);
 

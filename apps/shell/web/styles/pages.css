@@ -197,3 +197,13 @@ section > .h2, .h2-row { margin-bottom: 10px; }
 .key__more { margin-top: 4px; display: grid; gap: 2px; }
 .key__more b { font-weight: 500; color: var(--ink-2); }
 .clean--self .clean__box { border-style: dashed; }
+
+/* ---- /setup/keys: the one-time key page ---- */
+.keys__page { display: block; max-width: 720px; }
+.keys__page > .card + .card { margin-top: 14px; }
+.keys { list-style: none; margin: 10px 0 0; padding: 0; }
+.keys__row + .keys__row { border-top: 1px solid var(--card-line); }
+.keys__val { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--card-line); border-radius: 12px; background: var(--raised); }
+.keys__val code { flex: 1; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; overflow-wrap: anywhere; user-select: all; }
+.keys__sure { display: flex; align-items: center; gap: 9px; margin: 14px 0 0; font-size: 13.5px; }
+.keys__go { margin: 14px 0 6px; }
