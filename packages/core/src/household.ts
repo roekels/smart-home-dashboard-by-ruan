@@ -28,6 +28,8 @@ export interface Household {
   timezone: string;
   people: Person[];
   modules: Record<ModuleId, boolean>;
+  /** Extra hostnames some modules use (a wall tablet host, a tunnel to Home Assistant), by key. Empty = the defaults. */
+  hosts: Record<string, string>;
 }
 
 export class HouseholdError extends Error {
@@ -43,7 +45,8 @@ const PREFIX = /^[a-z][a-z0-9-]{1,15}$/;
 const PERSON_ID = /^[a-z][a-z0-9-]{0,23}$/;
 const EMAIL = /^[^\s@,;<>"]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 const LANGUAGE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/;
-const TOP = ["$schema", "household", "domain", "resourcePrefix", "language", "timezone", "people", "modules"];
+const TOP = ["$schema", "household", "domain", "resourcePrefix", "language", "timezone", "people", "modules", "hosts"];
+const HOST_KEY = /^[a-z][A-Za-z0-9]{0,31}$/;
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
@@ -88,6 +91,15 @@ export function householdProblems(input: unknown): string[] {
     if (!people.some((p) => isObj(p) && p.admin === true)) out.push("people: at least one person must be admin");
   }
 
+  if (input.hosts !== undefined) {
+    if (!isObj(input.hosts)) out.push("hosts: an object of hostnames, such as { \"kiosk\": \"kiosk.example.com\" }");
+    else for (const [k, v] of Object.entries(input.hosts)) {
+      if (!HOST_KEY.test(k)) out.push(`hosts: "${k}" is not a valid key`);
+      if (typeof v !== "string" || !DOMAIN.test(v)) out.push(`hosts.${k}: a hostname such as kiosk.example.com (lower case, no https://)`);
+      else if (v === input.domain) out.push(`hosts.${k}: must differ from the dashboard's own domain`);
+    }
+  }
+
   const modules = input.modules;
   if (!isObj(modules)) out.push("modules: required, one true or false per module");
   else {
@@ -113,6 +125,7 @@ export function parseHousehold(input: unknown): Household {
     timezone: c.timezone ?? "UTC",
     people: c.people.map((p: any) => ({ id: p.id, name: p.name.trim(), email: p.email.trim().toLowerCase(), admin: p.admin === true })),
     modules: Object.fromEntries(MODULE_IDS.map((m) => [m, c.modules[m] === true])) as Record<ModuleId, boolean>,
+    hosts: { ...(c.hosts ?? {}) },
   };
 }
 

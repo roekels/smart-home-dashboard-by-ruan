@@ -24,6 +24,11 @@
         }
       }
     },
+    "hosts": {
+      "type": "object",
+      "description": "Optional. Extra hostnames some modules use, by key (for example kiosk, homeAssistant). Left out, each is <label>.<parent of the domain>.",
+      "additionalProperties": { "type": "string" }
+    },
     "modules": {
       "type": "object", "additionalProperties": false,
       "properties": {

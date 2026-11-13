@@ -10,6 +10,7 @@ stand-in; **they have not yet been run against a live account**, so always start
 | `provision.mjs --dry-run` | prints the plan and every change it would make | no |
 | `provision.mjs` | creates stores and Access applications, writes `resources.json` and the wrangler configs; reuses what exists | yes |
 | `deploy.mjs` | first deploy of the Workers with the setup token | yes |
+| `secrets.mjs --dry-run` / `secrets.mjs` | makes the machine-made secrets (service tokens, gateway keys) and sets them on the Workers without printing them; lists what the person and the key page still owe | yes |
 | `verify.mjs` | checks the live dashboard from outside, with no credentials | no |
 | `teardown.mjs --dry-run` / `--confirm "<household>"` | removes what the setup created, data included | yes |
 | `wrangler-config.mjs` | renders every `apps/*/wrangler.jsonc` from the config, `resources.json` and the module files | writes files |
@@ -36,6 +37,7 @@ all driven by these files, so a module is installed only when its file exists **
   // Workers of its own (code in apps/<app>). Leave out when the module only adds to the shell.
   "workers": [{
     "app": "brain",                        // folder under apps/, also the Worker's short name
+    "main": "src/index.ts",                // optional entry file; this is the default
     "compatibilityFlags": ["nodejs_compat"],
     "d1": [{ "binding": "DB", "store": "brain", "migrations": "migrations" }],
     "kv": [],

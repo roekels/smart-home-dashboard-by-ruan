@@ -1,9 +1,9 @@
 {
-  "$comment": "Ids of the Cloudflare resources the setup creates. None of them is a secret. Copy to setup/resources.json, fill in the real ids, then run: node setup/wrangler-config.mjs",
+  "$comment": "Ids of the Cloudflare resources the setup creates. None of them is a secret. setup/provision.mjs writes the real file, setup/resources.json. In this example every id is a placeholder: \"placeholders\": true lets a fresh copy of the template render without real ids.",
+  "placeholders": true,
+  "accountId": "00000000000000000000000000000000",
   "accessTeam": "your-team",
   "accessAud": "0000000000000000000000000000000000000000000000000000000000000000",
-  "gateway": {
-    "d1DatabaseId": "00000000-0000-0000-0000-000000000000",
-    "kvNamespaceId": "00000000000000000000000000000000"
-  }
+  "d1": {},
+  "kv": {}
 }

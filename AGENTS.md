@@ -29,20 +29,36 @@ If any of these is missing, explain how to do it and stop.
 
 ## Setup, step by step
 
-> The scripts named here are being built. Until `setup/` contains them, tell the person the setup is not ready.
+> These scripts were tested against a stand-in for Cloudflare, not yet against a live account. Run every step with
+> `--dry-run` first, read what it prints, and stop if anything looks wrong. Steps 6 and 8 are not built yet (see
+> the notes under the table).
 
 | Step | What you do | Stop point |
 |---|---|---|
-| 1. Feasibility | `node setup/feasibility.mjs`: the token works and expires within 7 days, the zone is active, the repository is private, plan limits fit | stop on any fail and explain it |
-| 2. Questions | ask for the household name, each person's first name and sign-in email, who is admin, and which modules they want; write `household.config.json` from `household.config.example.json` | read the answers back and wait for a yes |
-| 3. Plan preview | `node setup/provision.mjs --dry-run`: prints every Worker, database, bucket, Access app, route and secret it would create | wait for a yes |
-| 4. Provision | `node setup/provision.mjs`: creates what the chosen modules need; safe to run again | none |
-| 5. Secrets | create the secrets marked `agent` in the manifest; give the person one checklist of the ones marked `user` | wait until they confirm each is stored in their password manager |
-| 6. Key page | send the admin to `/setup/keys` on their dashboard to generate the encryption keys | wait until the page reports it is locked |
-| 7. Verify | `node setup/verify.mjs`: one health check per module | fix or explain every fail |
-| 8. Token handover | create the two narrow tokens from the manifest, switch to them, ask the person to delete `SETUP_CLOUDFLARE_FULL_TOKEN`, then confirm it no longer works | do not finish while the full token still works |
-| 9. Connect their AI app | give them the MCP addresses to add in Claude or ChatGPT | none |
-| 10. Hand over | write `docs/your-setup.md` in their repository: what exists, with names only | none |
+| 1. Feasibility | `node setup/feasibility.mjs`: the token works and expires within 7 days, the zone is active, Zero Trust is set up, the names are free. Check yourself that the repository is private | stop on any fail and explain it |
+| 2. Questions | ask for the household name, each person's first name and sign-in email, who is admin, and which modules they want; write `household.config.json` from `household.config.example.json`; run step 1 again | read the answers back and wait for a yes |
+| 3. Plan preview | `node setup/provision.mjs --dry-run`: prints every Worker, database, bucket, Access application, hostname and secret, and every change it would make | wait for a yes |
+| 4. Provision | `node setup/provision.mjs`: creates the stores and Access applications, writes `setup/resources.json` and the wrangler configs; safe to run again. Commit the changed files | none |
+| 5. Deploy | `node setup/deploy.mjs --dry-run`, then without: installs, applies database migrations and deploys each Worker | stop on the first fail |
+| 6. Secrets | `node setup/secrets.mjs --dry-run`, then without: makes the machine-made secrets and sets them on the Workers. It prints the names the person still has to enter; give them that as one checklist | wait until they confirm each is stored in their password manager |
+| 7. Key page | send the admin to `/setup/keys` on their dashboard to generate the encryption keys | wait until the page reports it is locked |
+| 8. Verify | `node setup/verify.mjs`: checks the live dashboard from outside | fix or explain every fail |
+| 9. Clicks only the person can do | the list below | wait until each is done |
+| 10. Token handover | ask the person to delete `SETUP_CLOUDFLARE_FULL_TOKEN` in Cloudflare and in your environment, then run `node setup/feasibility.mjs` and confirm the token no longer works | do not finish while the full token still works |
+| 11. Connect their AI app | give them the MCP addresses to add in Claude or ChatGPT | none |
+| 12. Hand over | write `docs/your-setup.md` in their repository: what exists, with names only | none |
+
+Not built yet: the key page of step 7 and a script for step 10. Until they are, tell the person that modules which
+encrypt data (Brain's private notes, Finance, Health, data export) cannot be switched on.
+
+Clicks only the person can do (step 9), in the Cloudflare dashboard:
+
+- **Workers Builds:** connect each Worker to the private repository, so a merge to `main` deploys it. Cloudflare
+  creates the build token itself (`DEPLOY_CLOUDFLARE_BUILD_TOKEN` in the manifest).
+- **Passkey sign-in:** in Zero Trust, choose the sign-in method and require a passkey or the device's fingerprint
+  or face check.
+- **Home Assistant** (only with that module): install the Cloudflared add-on and point its tunnel at the hostname
+  the plan preview printed.
 
 To remove everything again: `node setup/teardown.mjs --dry-run`, show the list, wait for a yes that names the
 household, then run it without `--dry-run`.
