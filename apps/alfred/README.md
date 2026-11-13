@@ -88,10 +88,11 @@ raised to "needs a card" at most, never to "runs".
 `setup/modules/alfred.json` declares all of this; `node setup/wrangler-config.mjs` renders the Worker's config from
 it. Never write `wrangler.jsonc` by hand.
 
-**Gateway key scopes.** The module file gives the key `household.read` and the home scopes. When you switch on a
-data module (notes, calendar, finance, health), add that module's scopes to `gatewayKeys[0].scopes` and run
-`node setup/secrets.mjs` again, or the assistant will not see those tools. `GET /api/alfred/tools` (admins) lists
-every tool it can reach and its mode, which is the quickest way to check.
+**Gateway key scopes.** The module file gives the key what the assistant needs from each module: reading and
+changing, never archiving or removing. It includes every person's calendar (`cal.{person}.…`), because one key
+serves the whole household; the Worker then lets each person reach only their own and the shared one. A scope for a
+module that is off does nothing. After changing the list, run `node setup/secrets.mjs` again.
+`GET /api/alfred/tools` (admins) lists every tool it can reach and its mode, which is the quickest way to check.
 
 `GET /api/alfred/health` (admins) says whether it is set up and names what is missing, never a value.
 
