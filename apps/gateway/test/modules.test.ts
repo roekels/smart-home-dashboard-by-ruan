@@ -37,7 +37,7 @@ async function connect(build: (log: Log) => McpServer) {
 
 test("every module that is on has a sound service and a server", () => {
   const list = servicesFor(H);
-  assert.deepEqual(list.map((s) => s.id), ["household", "finance", "health"]);
+  assert.deepEqual(list.map((s) => s.id), ["household", "brain", "finance", "health"]);
   assert.deepEqual(serviceProblems(list), []);
   for (const s of list) assert.ok(SERVERS[s.id], `no server for ${s.id}`);
 });
@@ -147,4 +147,42 @@ test("calendar MCP: one scope per calendar and action, tools and calendar choice
 
   const off = await connect((log) => buildCalendarServer({ actor: "k", via: "key", scopes: ["cal.alex.read"] }, { h, calendar: undefined, log: (tool, ok, target) => void log.push([tool, ok, target]) }));
   assert.match((await off.call("calendars")).text, /not connected/);
+});
+
+test("brain MCP: tools follow the scopes, a person's sealed notes stay theirs, the audit holds paths only", async () => {
+  const { brainService } = await import("../../brain/src/service.ts");
+  const { buildBrainServer } = await import("../src/tools/brain.ts");
+  const service = servicesFor(H).find((s) => s.id === "brain")!;
+  assert.deepEqual(Object.keys(service.scopes), ["brain.read", "brain.read.sensitive", "brain.create", "brain.update", "brain.write.sensitive", "brain.archive"]);
+  assert.equal(service.keyOnly, undefined);
+  const brain = brainService({ DB: fakeD1(new URL("../../brain/migrations/", import.meta.url)), HOUSEHOLD: JSON.stringify(config), BRAIN_SENSITIVE_ENCRYPTION_KEY: KEY });
+  const as = (p: Principal) => connect((log) => buildBrainServer(p, { h: H, brain, log: (tool, ok, target) => void log.push([tool, ok, target]) }));
+
+  const reader = await as({ actor: "oauth:Test", via: "oauth", scopes: ["brain.read"], user: sam.email });
+  const tools = (await reader.client.listTools()).tools;
+  assert.deepEqual(tools.map((t) => t.name), ["search", "read", "tree", "recent", "log_read", "history", "lint"]);
+  assert.ok(tools.every((t) => t.annotations?.readOnlyHint === true));
+  assert.match(reader.client.getInstructions() ?? "", /One root per person \(Alex, Sam\)/);
+
+  const full = { actor: "oauth:Test", via: "oauth" as const, scopes: Object.keys(service.scopes) };
+  const alexApp = await as({ ...full, user: alex.email }), samApp = await as({ ...full, user: sam.email });
+  const all = (await alexApp.client.listTools()).tools;
+  assert.equal(all.length, 16);
+  assert.ok(all.every((t) => t.annotations?.destructiveHint === false), "nothing in the Brain deletes");
+  assert.equal((await alexApp.call("create", { path: "Alex/Private", kind: "hub", summary: "private things" })).error, false);
+  assert.equal((await alexApp.call("create", { path: "Alex/Private/Surprise", body: "A walrus for the party.", summary: "party idea" })).json().sensitivity, "sensitive");
+  assert.match((await alexApp.call("read", { ref: "Alex/Private/Surprise" })).json().body, /walrus/);
+  const hidden = await samApp.call("read", { ref: "Alex/Private/Surprise" });
+  assert.deepEqual([hidden.error, hidden.text], [true, 'No note "Alex/Private/Surprise"']);
+  assert.deepEqual((await samApp.call("search", { query: "walrus" })).json(), []);
+  assert.deepEqual(alexApp.log.at(-1), ["read", true, "Alex/Private/Surprise"]);
+  assert.deepEqual(samApp.log, [["read", false, "Alex/Private/Surprise"], ["search", true, null]]);
+  assert.equal(JSON.stringify([alexApp.log, samApp.log]).includes("walrus"), false);
+
+  const alfredKey = await as({ actor: "alfred", via: "key", scopes: ["brain.read", "brain.create", "brain.update"] });
+  assert.deepEqual((await alfredKey.client.listTools()).tools.map((t) => t.name).filter((n) => /lock|archive/.test(n)), [], "no archive scope, no archive tools");
+  assert.equal((await alfredKey.call("read", { ref: "Alex/Private/Surprise" })).error, true, "a key without the sensitive scope does not see sealed notes");
+
+  const off = await connect((log) => buildBrainServer({ actor: "k", via: "key", scopes: ["brain.read"] }, { h: H, brain: undefined, log: (tool, ok, target) => void log.push([tool, ok, target]) }));
+  assert.match((await off.call("tree")).text, /not connected/);
 });

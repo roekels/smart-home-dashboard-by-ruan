@@ -8,14 +8,16 @@ import type { CalendarUiApi } from "./src/contract.ts";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** GET /api/calendar?from=&to= (inclusive days). Everyone in the household sees every calendar. */
-export async function calendarRoute(req: Request, url: URL, calendar: CalendarUiApi | undefined): Promise<Response> {
+/** GET /api/calendar?from=&to= (inclusive days). Everyone in the household sees every calendar. A caller that is
+ *  not a person (the kiosk's wall tablet, id "#kiosk") only gets the shared calendar. */
+export async function calendarRoute(req: Request, url: URL, calendar: CalendarUiApi | undefined, sharedOnly = false): Promise<Response> {
   if (req.method !== "GET") throw new HttpError(405, "method not allowed");
   const from = url.searchParams.get("from") ?? "", to = url.searchParams.get("to") ?? "";
   if (!DATE.test(from) || !DATE.test(to)) throw new HttpError(400, "from and to are required, YYYY-MM-DD");
   if (!calendar) throw new HttpError(503, "the calendar Worker is not connected");
   try {
-    return json(await calendar.events({ from, to }));
+    const { events } = await calendar.events({ from, to });
+    return json({ events: sharedOnly ? events.filter((e) => e.owner === null) : events });
   } catch (e) {
     // the calendar Worker's own messages are safe to show (service.ts); they never quote an event
     throw new HttpError(502, (e as Error).message.slice(0, 300));
@@ -25,7 +27,7 @@ export async function calendarRoute(req: Request, url: URL, calendar: CalendarUi
 export const calendarModule: ShellModule = {
   id: "calendar",
   pages: [{ path: "/home/calendar", label: "Calendar", icon: "calendar", where: "home" }],
-  api: { calendar: (c) => calendarRoute(c.req, c.url, c.env.CALENDAR) },
+  api: { calendar: (c) => calendarRoute(c.req, c.url, c.env.CALENDAR, c.person.id.startsWith("#")) },
   security: (h) => ({
     nodes: [{
       id: "calendar-worker", zone: "cf", name: resourceName(h, "calendar"), sub: "Worker", icon: "calendar", status: "ok",

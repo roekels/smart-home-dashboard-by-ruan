@@ -1,0 +1,40 @@
+{
+  "name": "brain-map-vendor",
+  "private": true,
+  "type": "module",
+  "description": "Builds the Brain map's graph, 3D and markdown libraries into one local ES module (apps/shell/public/vendor/brain-map.js). Build-time only.",
+  "scripts": {
+    "build": "node build.mjs ../../../public/vendor/brain-map.js"
+  },
+  "devDependencies": {
+    "3d-force-graph": "1.80.1",
+    "dompurify": "3.4.17",
+    "esbuild": "0.28.2",
+    "force-graph": "1.52.0",
+    "marked": "18.1.2",
+    "three": "0.187.0"
+  },
+  "overrides": {
+    "@babel/runtime": "7.29.10",
+    "@tweenjs/tween.js": "23.1.3",
+    "d3-array": "3.2.4",
+    "d3-color": "3.1.0",
+    "d3-dispatch": "3.0.1",
+    "d3-drag": "3.0.0",
+    "d3-ease": "3.0.1",
+    "d3-format": "3.1.2",
+    "d3-interpolate": "3.0.1",
+    "d3-quadtree": "3.0.1",
+    "d3-scale": "4.0.2",
+    "d3-scale-chromatic": "3.1.0",
+    "d3-selection": "3.0.0",
+    "d3-time": "3.1.0",
+    "d3-time-format": "4.1.0",
+    "d3-timer": "3.0.1",
+    "d3-transition": "3.0.1",
+    "d3-zoom": "3.0.0",
+    "float-tooltip": "1.7.5",
+    "preact": "10.29.8",
+    "three-render-objects": "1.43.0"
+  }
+}

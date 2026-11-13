@@ -1,0 +1,426 @@
+{
+ "$comment": "Made-up notes for the demo Brain. A path is the chain of titles from one of the roots (a person's name, or Family). updated '@-3' = three days before today. Links are [[Title]] in the text.",
+ "notes": [
+  {
+   "path": "Alex",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-200",
+   "body": "# Alex\n"
+  },
+  {
+   "path": "Sam",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-200",
+   "body": "# Sam\n"
+  },
+  {
+   "path": "Robin",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-200",
+   "body": "# Robin\n"
+  },
+  {
+   "path": "Kit",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-200",
+   "body": "# Kit\n"
+  },
+  {
+   "path": "Family",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-200",
+   "body": "# Family\n"
+  },
+  {
+   "path": "Family/Home",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-6",
+   "body": "# Home\n\nEverything about the house. Start with [[Boiler]] and [[Wifi and network]].\n"
+  },
+  {
+   "path": "Family/Home/Boiler",
+   "kind": "page",
+   "type": "system",
+   "updated": "@-2",
+   "body": "# Boiler\n\nGas combi boiler in the utility cupboard.\n\n- Serviced once a year, usually in October\n- Pressure should sit between 1 and 1.5 bar\n- Engineer: see [[Trades we use]]\n\nThe manual is in the folder above the fuse box.\n"
+  },
+  {
+   "path": "Family/Home/Wifi and network",
+   "kind": "page",
+   "type": "system",
+   "updated": "@-30",
+   "body": "# Wifi and network\n\nOne router in the hall, a mesh point upstairs. The password is in the password manager under \"Home wifi\", never here.\n\nThe wall tablet and the [[Solar panels]] inverter are on the guest network.\n"
+  },
+  {
+   "path": "Family/Home/Solar panels",
+   "kind": "page",
+   "type": "system",
+   "updated": "@-45",
+   "body": "# Solar panels\n\nTwelve panels on the south roof, fitted two summers ago. The inverter reports to the Energy page.\n\nCleaning: once a year, see [[Trades we use]].\n"
+  },
+  {
+   "path": "Family/Home/Trades we use",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-2",
+   "body": "# Trades we use\n\n- Boiler: the engineer two streets down, booked by phone\n- Roof and gutters: the firm that fitted the [[Solar panels]]\n- Electrician: ask next door, they were happy with theirs\n"
+  },
+  {
+   "path": "Family/Home/Kitchen refit",
+   "kind": "page",
+   "type": "project",
+   "updated": "@-4",
+   "body": "# Kitchen refit\n\nPlanned for next spring. Budget agreed, see [[Savings goals]].\n\nDecisions so far:\n- Keep the layout, replace the worktops\n- Induction hob\n- [[Alex]] wants a larger sink\n",
+   "status": "planned"
+  },
+  {
+   "path": "Family/Car",
+   "kind": "page",
+   "type": "system",
+   "updated": "@-12",
+   "body": "# Car\n\nThe estate car. MOT is due each March; the garage sends a reminder.\n\nTyres were changed last winter. Insurance renews in June, see [[Insurance]].\n"
+  },
+  {
+   "path": "Family/Money",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-15",
+   "body": "# Money\n\nPointers only: amounts live on the Finance page.\n"
+  },
+  {
+   "path": "Family/Money/Savings goals",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-15",
+   "body": "# Savings goals\n\n1. [[Kitchen refit]]\n2. [[Summer in Cornwall]]\n3. A cushion of three months of bills\n"
+  },
+  {
+   "path": "Family/Money/Insurance",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-60",
+   "body": "# Insurance\n\nHome, car and travel are all with the same insurer, renewed in June. Documents are in the shared drive under Household.\n"
+  },
+  {
+   "path": "Family/Trips",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-3",
+   "body": "# Trips\n\nWhere we went and where we want to go.\n"
+  },
+  {
+   "path": "Family/Trips/Summer in Cornwall",
+   "kind": "page",
+   "type": "trip",
+   "updated": "@-1",
+   "body": "# Summer in Cornwall\n\nA week near St Ives in August. Cottage is reserved, not yet paid in full.\n\n- [[Sam]] books the train\n- [[Robin]] wants to surf, see [[Surf lessons]]\n- Packing list from [[Lake District 2024]] worked well\n",
+   "status": "planned",
+   "booking": "tentative"
+  },
+  {
+   "path": "Family/Trips/Surf lessons",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-1",
+   "body": "# Surf lessons\n\nTwo schools on the beach take beginners from age eight. Book a week ahead in August.\n"
+  },
+  {
+   "path": "Family/Trips/Lake District 2024",
+   "kind": "page",
+   "type": "trip",
+   "updated": "@-400",
+   "body": "# Lake District 2024\n\nFive days in Keswick. Rained for three of them and nobody minded.\n\nWorth repeating: the boat across the lake, the pencil museum for [[Kit]].\n",
+   "status": "done",
+   "archived": true,
+   "locked": true
+  },
+  {
+   "path": "Family/People",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-25",
+   "body": "# People\n\nFriends, family and neighbours.\n"
+  },
+  {
+   "path": "Family/People/Grandma Jo",
+   "kind": "page",
+   "type": "person",
+   "updated": "@-25",
+   "body": "# Grandma Jo\n\nSam's mum. Birthday 14 May. Visits most school holidays and likes the back bedroom.\n\nLoves the garden: see [[Vegetable patch]].\n"
+  },
+  {
+   "path": "Family/People/Next door",
+   "kind": "page",
+   "type": "person",
+   "updated": "@-90",
+   "body": "# Next door\n\nPriya and Tom at number 12. They hold a spare key and water the plants when we are away.\n"
+  },
+  {
+   "path": "Family/Garden",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-9",
+   "body": "# Garden\n"
+  },
+  {
+   "path": "Family/Garden/Vegetable patch",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-9",
+   "body": "# Vegetable patch\n\nThree raised beds. This year: tomatoes, beans, courgettes.\n\n[[Kit]] is in charge of watering. [[Grandma Jo]] brought the bean seeds.\n"
+  },
+  {
+   "path": "Family/Traditions",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-70",
+   "body": "# Traditions\n\n- Pancakes on the first day of every school holiday\n- Film night on Fridays, [[Robin]] and [[Kit]] take turns to choose\n- A walk on New Year's Day whatever the weather\n"
+  },
+  {
+   "path": "Alex/Work",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-5",
+   "body": "# Work\n"
+  },
+  {
+   "path": "Alex/Work/Team offsite",
+   "kind": "page",
+   "type": "project",
+   "updated": "@-5",
+   "body": "# Team offsite\n\nTwo days in September. Alex is organising the venue.\n\nClashes with nothing at home; [[Sam]] has the school run that week.\n",
+   "status": "active"
+  },
+  {
+   "path": "Alex/Work/Reading list",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-40",
+   "body": "# Reading list\n\n- The book on estimating everyone keeps quoting\n- Notes from the spring conference\n"
+  },
+  {
+   "path": "Alex/Running",
+   "kind": "page",
+   "type": "goal",
+   "updated": "@-3",
+   "body": "# Running\n\nTraining for a half marathon in October. Three runs a week; long run on Sunday.\n\nThe knee is fine as long as the shoes are replaced on time, see [[Knee]].\n",
+   "status": "active"
+  },
+  {
+   "path": "Alex/Health",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-50",
+   "body": "# Health\n",
+   "sensitivity": "sensitive"
+  },
+  {
+   "path": "Alex/Health/Knee",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-50",
+   "body": "# Knee\n\nPhysio in the spring for the left knee. Exercises twice a week keep it quiet.\n",
+   "sensitivity": "sensitive"
+  },
+  {
+   "path": "Alex/Ideas",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-18",
+   "body": "# Ideas\n\n- A proper workbench in the shed\n- Learn to bake bread that [[Kit]] will eat\n"
+  },
+  {
+   "path": "Sam/Work",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-7",
+   "body": "# Work\n"
+  },
+  {
+   "path": "Sam/Work/Year 5 class",
+   "kind": "page",
+   "type": "project",
+   "updated": "@-7",
+   "body": "# Year 5 class\n\nTopics this term: rivers, fractions, the Tudors.\n\nThe river trip needs two more parent helpers.\n",
+   "status": "active"
+  },
+  {
+   "path": "Sam/Work/River trip",
+   "kind": "page",
+   "type": "project",
+   "updated": "@-1",
+   "body": "# River trip\n\nCoach is booked. Risk assessment done. Wellies list sent home.\n\nIdea from [[Lake District 2024]]: the boat was the highlight, find one here too.\n",
+   "status": "active"
+  },
+  {
+   "path": "Sam/Choir",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-14",
+   "body": "# Choir\n\nThursday evenings. Concert in December; [[Grandma Jo]] wants tickets.\n"
+  },
+  {
+   "path": "Sam/Books",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-22",
+   "body": "# Books\n\nReading: a long novel about a lighthouse. Next: whatever the book club picks.\n"
+  },
+  {
+   "path": "Sam/Health",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-80",
+   "body": "# Health\n",
+   "sensitivity": "sensitive"
+  },
+  {
+   "path": "Sam/Health/Hay fever",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-80",
+   "body": "# Hay fever\n\nStarts in May. The usual tablets work; start them two weeks early.\n",
+   "sensitivity": "sensitive"
+  },
+  {
+   "path": "Robin/Football",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-2",
+   "body": "# Football\n\nSaturday league, plays left back. Kit bag lives by the front door.\n\nBoots are a size up since March.\n"
+  },
+  {
+   "path": "Robin/School",
+   "kind": "hub",
+   "type": "hub",
+   "updated": "@-10",
+   "body": "# School\n"
+  },
+  {
+   "path": "Robin/School/Science project",
+   "kind": "page",
+   "type": "project",
+   "updated": "@-10",
+   "body": "# Science project\n\nA model of the water cycle, due before half term. Needs a clear box and food colouring.\n",
+   "status": "active"
+  },
+  {
+   "path": "Robin/Wish list",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-1",
+   "body": "# Wish list\n\n- Surfing in the summer: [[Surf lessons]]\n- A telescope\n"
+  },
+  {
+   "path": "Kit/Drawing",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-8",
+   "body": "# Drawing\n\nFills a sketchbook a month. Favourite subject: the cat next door, see [[Next door]].\n"
+  },
+  {
+   "path": "Kit/Swimming",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-6",
+   "body": "# Swimming\n\nLesson on Wednesdays. Just moved up to the deep end group.\n"
+  },
+  {
+   "path": "Kit/Favourite things",
+   "kind": "page",
+   "type": "note",
+   "updated": "@-9",
+   "body": "# Favourite things\n\nPencils, pancakes ([[Traditions]]), and the beans in the [[Vegetable patch]].\n"
+  }
+ ],
+ "activity": [
+  {
+   "minutes_ago": 1300,
+   "job": "edit",
+   "summary": "Kitchen decisions added",
+   "paths": [
+    "Family/Home/Kitchen refit"
+   ],
+   "actor": "dashboard (alex)"
+  },
+  {
+   "minutes_ago": 1100,
+   "job": "edit",
+   "summary": "Train times noted",
+   "paths": [
+    "Family/Trips/Summer in Cornwall"
+   ],
+   "actor": "dashboard (sam)"
+  },
+  {
+   "minutes_ago": 900,
+   "job": "create",
+   "summary": "Surf schools looked up",
+   "paths": [
+    "Family/Trips/Surf lessons"
+   ],
+   "actor": "key:assistant"
+  },
+  {
+   "minutes_ago": 880,
+   "job": "link",
+   "summary": "Wish list linked to the trip",
+   "paths": [
+    "Robin/Wish list",
+    "Family/Trips/Surf lessons"
+   ],
+   "actor": "key:assistant"
+  },
+  {
+   "minutes_ago": 600,
+   "job": "edit",
+   "summary": "Coach booked",
+   "paths": [
+    "Sam/Work/River trip"
+   ],
+   "actor": "dashboard (sam)"
+  },
+  {
+   "minutes_ago": 420,
+   "job": "edit",
+   "summary": "New boots",
+   "paths": [
+    "Robin/Football"
+   ],
+   "actor": "dashboard (alex)"
+  },
+  {
+   "minutes_ago": 300,
+   "job": "edit",
+   "summary": "Long run moved to Sunday",
+   "paths": [
+    "Alex/Running"
+   ],
+   "actor": "dashboard (alex)"
+  },
+  {
+   "minutes_ago": 95,
+   "job": "edit",
+   "summary": "Boiler service noted",
+   "paths": [
+    "Family/Home/Boiler"
+   ],
+   "actor": "key:assistant"
+  },
+  {
+   "minutes_ago": 90,
+   "job": "edit",
+   "summary": "Engineer's details moved here",
+   "paths": [
+    "Family/Home/Trades we use"
+   ],
+   "actor": "key:assistant"
+  }
+ ]
+}

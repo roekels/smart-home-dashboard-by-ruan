@@ -1,0 +1,20 @@
+{
+  "module": "brain",
+  "d1": [{ "name": "brain" }],
+  "workers": [
+    {
+      "app": "brain",
+      "compatibilityFlags": ["nodejs_compat"],
+      "d1": [{ "binding": "DB", "store": "brain", "migrations": "migrations" }],
+      "vars": { "BRAIN_SHARED_ROOT": "Family" }
+    }
+  ],
+  "shell": { "services": [{ "binding": "BRAIN", "app": "brain", "entrypoint": "BrainUi" }] },
+  "gateway": { "services": [{ "binding": "BRAIN", "app": "brain", "entrypoint": "Brain" }] },
+  "secrets": [{ "name": "BRAIN_SENSITIVE_ENCRYPTION_KEY", "app": "brain" }],
+  "publicPaths": ["/brain/mcp*"],
+  "checks": [
+    { "name": "Brain MCP refuses a caller with no token", "path": "/brain/mcp", "method": "POST", "expectStatus": 401 },
+    { "name": "Brain API asks for a sign-in", "path": "/api/brain/graph", "expectAccessLogin": true }
+  ]
+}

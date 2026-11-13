@@ -28,6 +28,13 @@
   "observability": {
     "enabled": true
   },
+  "services": [
+    {
+      "binding": "BRAIN",
+      "service": "home-brain",
+      "entrypoint": "BrainUi"
+    }
+  ],
   "vars": {
     "HOUSEHOLD": "{\"household\":\"Example family\",\"domain\":\"home.example.com\",\"resourcePrefix\":\"home\",\"language\":\"en\",\"timezone\":\"Europe/London\",\"currency\":\"GBP\",\"people\":[{\"id\":\"alex\",\"name\":\"Alex\",\"email\":\"alex@example.com\",\"admin\":true},{\"id\":\"sam\",\"name\":\"Sam\",\"email\":\"sam@example.com\",\"admin\":false}],\"modules\":{\"brain\":true,\"calendar\":false,\"finance\":false,\"health\":false,\"dataExport\":true,\"homeAssistant\":false,\"energy\":false,\"kiosk\":false,\"edgeAgents\":false,\"alfred\":false},\"hosts\":{}}",
     "ACCESS_TEAM": "your-team",
