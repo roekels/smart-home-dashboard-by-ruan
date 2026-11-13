@@ -8,6 +8,9 @@
  *   finance  Admins only (like the Finance page). A row owned by another person needs the speaker's written request;
  *            shared rows ("joint") do not.
  *
+ *   calendar Everyone reaches their own calendar and the shared one, never another person's. Calls that take a list
+ *            of `calendars` are cut down to those two; a call that names another person's `calendar` is refused.
+ *
  * "Asked in writing" is checked, not trusted: the model must quote the speaker's own words in `other_person_request`,
  * and the quote must really be in one of their messages in this conversation. A write then shows a card that names
  * the person and the quote.
@@ -54,6 +57,7 @@ export interface ScopeTool { server: string; inputSchema?: Record<string, unknow
  * takes a `person`), plus who else it is for, or the reason it is refused (handed to the model as the tool's error).
  */
 export function scopeCall(h: Household, speaker: Person, t: ScopeTool, input: Record<string, unknown>, said: string[]): Scoped {
+  if (t.server === CALENDAR) return calendarCall(h, speaker, t, input);
   if (!PERSONAL.has(t.server)) return { ok: true, input, other: null };
   if (ADMIN_ONLY.has(t.server) && !speaker.admin) return { ok: false, reason: `${t.server} is only open to the household's admins.` };
 
@@ -73,6 +77,29 @@ export function scopeCall(h: Household, speaker: Person, t: ScopeTool, input: Re
     };
   }
   return { ok: true, input: out, other: { person: who.name, asked } };
+}
+
+/** The calendar id every household has next to one per person (the gateway's calendar service). */
+export const SHARED_CALENDAR = "shared";
+const CALENDAR = "calendar";
+
+/** Calendars: the speaker's own and the shared one. The gateway key may reach more; this is what keeps one person's
+ *  diary out of another person's chat. Also used for the calendar fetched up front (context.ts). */
+function calendarCall(h: Household, speaker: Person, t: ScopeTool, input: Record<string, unknown>): Scoped {
+  const mine = [speaker.id, SHARED_CALENDAR];
+  const refuse = (id: string): Scoped => {
+    const who = personNamed(h, id);
+    return { ok: false, reason: `${who ? `${who.name}'s calendar` : `The calendar "${id}"`} is not open here. ${speaker.name} reaches their own calendar and the shared one.` };
+  };
+  let out = input;
+  if (typeof input.calendar === "string" && !mine.includes(input.calendar.trim().toLowerCase())) return refuse(input.calendar);
+  if ("calendars" in obj(obj(t.inputSchema).properties)) {
+    const asked = Array.isArray(input.calendars) ? input.calendars.filter((c): c is string => typeof c === "string").map((c) => c.trim().toLowerCase()) : null;
+    const kept = asked ? asked.filter((c) => mine.includes(c)) : mine;
+    if (asked && asked.length && !kept.length) return refuse(asked[0]);
+    out = { ...input, calendars: kept.length ? kept : mine };
+  }
+  return { ok: true, input: out, other: null };
 }
 
 const norm = (s: string): string => s.toLowerCase().replace(/[“”„"'‘’«»]/g, "").replace(/\s+/g, " ").trim();
