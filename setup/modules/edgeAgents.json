@@ -36,7 +36,7 @@
     "/devices/mcp*"
   ],
   "serviceAuthPaths": [
-    "/api/agents/*"
+    { "path": "/api/agents/*", "audVar": { "app": "shell", "name": "AGENTS_ACCESS_AUD" } }
   ],
   "checks": [
     {

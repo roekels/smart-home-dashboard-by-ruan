@@ -45,9 +45,11 @@ kinds `metrics.*`, `power.*` and `event`.
 
 ## Adding a computer
 
-1. Your AI creates a Cloudflare Access service token for the machine and adds it to the policy of the
-   "machines" Access application. Keep both halves in your password manager as
-   `AGENT_<MACHINE>_SERVICE_TOKEN_ID` and `AGENT_<MACHINE>_SERVICE_TOKEN_KEY`.
+1. You make a Cloudflare Access service token for the machine yourself (Zero Trust > Access > Service auth), named
+   `<prefix>-agent-<machine>`, and keep both halves in your password manager as
+   `AGENT_<MACHINE>_SERVICE_TOKEN_ID` and `AGENT_<MACHINE>_SERVICE_TOKEN_KEY`. Do not let your AI create it: the
+   secret half would pass through it. Then your AI runs `node setup/provision.mjs`, which finds the token by its
+   name and adds it to the policy of the machines' Access application. Until one token exists nobody gets through.
 2. Settings > Edge agents > Add a computer gives you a one-time code and the command to run.
 3. On the computer, build and install the agent ([`agent/README.md`](../../agent/README.md)) and run that command.
 4. Compare the fingerprint, approve.
