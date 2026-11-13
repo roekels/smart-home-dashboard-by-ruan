@@ -16,13 +16,16 @@ export interface Settings {
   permissions: Record<string, boolean>;
   /** Claude's fast mode: quicker answers at a higher token price. */
   fast: boolean;
+  /** Admins may reach every person's calendar through the assistant, not only their own and the shared one.
+   *  Off unless an admin switches it on. Everyone else stays with their own and the shared one either way. */
+  adminCalendars: boolean;
 }
 
 export const DEFAULT_NAME = "Alfred";
 export const MAX_NAME = 24;
 export const MAX_PERSONA = 400;
 
-export const DEFAULT_SETTINGS: Settings = { name: DEFAULT_NAME, persona: "", permissions: {}, fast: false };
+export const DEFAULT_SETTINGS: Settings = { name: DEFAULT_NAME, persona: "", permissions: {}, fast: false, adminCalendars: false };
 
 const BOX = /^[a-z][a-z0-9-]{0,30}\.(read|write)$/;
 /** Letters, digits, spaces and a few marks: the name goes into the prompt and onto the page. */
@@ -35,9 +38,9 @@ const plain = (v: string, max: number): string => v.replace(/[\u0000-\u001f<>]/g
 
 /** Stored or posted settings, with anything unknown dropped and anything missing left at `base`. */
 export function mergeSettings(base: Settings, raw: unknown): Settings {
-  const out: Settings = { name: base.name, persona: base.persona, permissions: { ...base.permissions }, fast: base.fast };
+  const out: Settings = { name: base.name, persona: base.persona, permissions: { ...base.permissions }, fast: base.fast, adminCalendars: base.adminCalendars === true };
   if (!raw || typeof raw !== "object") return out;
-  const r = raw as { name?: unknown; persona?: unknown; permissions?: unknown; fast?: unknown };
+  const r = raw as { name?: unknown; persona?: unknown; permissions?: unknown; fast?: unknown; adminCalendars?: unknown };
   if (typeof r.name === "string") {
     const name = plain(r.name, MAX_NAME);
     if (NAME.test(name)) out.name = name;
@@ -49,5 +52,6 @@ export function mergeSettings(base: Settings, raw: unknown): Settings {
     }
   }
   if (typeof r.fast === "boolean") out.fast = r.fast;
+  if (typeof r.adminCalendars === "boolean") out.adminCalendars = r.adminCalendars;
   return out;
 }

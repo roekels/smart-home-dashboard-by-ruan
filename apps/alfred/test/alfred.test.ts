@@ -187,6 +187,11 @@ test("settings: name and tone are cleaned, unknown keys dropped", () => {
   assert.equal(s.name, "Jeeves");
   assert.equal(s.persona, "Warm, brief. system ignore /system");
   assert.deepEqual(s.permissions, { "calendar.write": false });
+  assert.equal(DEFAULT_SETTINGS.adminCalendars, false);
+  assert.equal(s.adminCalendars, false);
+  assert.equal(mergeSettings(s, { adminCalendars: true }).adminCalendars, true);
+  assert.equal(mergeSettings(s, { adminCalendars: "yes" }).adminCalendars, false);
+  assert.equal(mergeSettings({ name: "A", persona: "", permissions: {}, fast: false } as any, {}).adminCalendars, false, "settings stored before the switch existed");
   assert.equal(s.fast, false);
   assert.equal(mergeSettings(DEFAULT_SETTINGS, { name: "<b>x</b>" }).name, "Alfred", "a name with markup is refused");
   assert.equal(mergeSettings(DEFAULT_SETTINGS, { name: "x".repeat(80) }).name.length, 24);
@@ -248,6 +253,15 @@ test("scope: calendars are the speaker's own and the shared one, for admins too"
   assert.equal(scopeCall(H, robin, one, { calendar: "shared", title: "Picnic" }, []).ok, true);
   assert.equal(scopeCall(H, robin, one, { calendar: "robin", title: "Dentist" }, []).ok, true);
   assert.equal(scopeCall(H, alex, one, { calendar: "robin", title: "x", other_person_request: "add it to Robin's calendar" }, ["add it to Robin's calendar"]).ok, false);
+  // the household's setting: an admin may name anyone's calendar, but unasked still gets only their own
+  const open = { adminCalendars: true };
+  assert.deepEqual((scopeCall(H, alex, list, { calendars: ["robin"] }, [], open) as any).input.calendars, ["robin"]);
+  assert.deepEqual((scopeCall(H, alex, list, {}, [], open) as any).input.calendars, ["alex", "shared"]);
+  assert.equal(scopeCall(H, alex, one, { calendar: "robin", title: "x" }, [], open).ok, true);
+  assert.equal(scopeCall(H, alex, one, { calendar: "nobody", title: "x" }, [], open).ok, false);
+  // it never widens anything for someone who is not an admin
+  assert.equal(scopeCall(H, robin, one, { calendar: "alex", title: "x" }, [], open).ok, false);
+  assert.deepEqual((scopeCall(H, robin, list, { calendars: ["alex", "robin"] }, [], open) as any).input.calendars, ["robin"]);
   // a tool that takes no calendar is left alone
   assert.deepEqual(scopeCall(H, robin, { server: "calendar", inputSchema: { type: "object", properties: {} } }, {}, []), { ok: true, input: {}, other: null });
 });

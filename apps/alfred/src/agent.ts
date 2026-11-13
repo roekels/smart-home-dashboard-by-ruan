@@ -177,7 +177,7 @@ async function turn(deps: TurnDeps, input: TurnInput, emit: Emit, trace: Trace, 
     if (config.autoContext !== false) {
       const ctx = await autoContext(input.text, (s, n, a) => {
         // the same person rules as a call the model makes (scope.ts): the calendar fetched up front is the speaker's
-        const scoped = scopeCall(h, speaker, { server: s, inputSchema: byName.get(`${s}__${n}`)?.inputSchema }, a, []);
+        const scoped = scopeCall(h, speaker, { server: s, inputSchema: byName.get(`${s}__${n}`)?.inputSchema }, a, [], settings);
         if (!scoped.ok) throw new Error(scoped.reason);
         return tools.call(s, n, scoped.input);
       }, (q) => byName.get(q)?.mode === "auto", emit, {
@@ -300,7 +300,7 @@ async function turn(deps: TurnDeps, input: TurnInput, emit: Emit, trace: Trace, 
         return;
       }
       // whose records or calendar is this? (scope.ts)
-      const scoped = scopeCall(h, speaker, t, raw, said);
+      const scoped = scopeCall(h, speaker, t, raw, said, settings);
       if (!scoped.ok) {
         results.set(u.id, { type: "tool_result", tool_use_id: u.id, is_error: true, content: scoped.reason });
         return;

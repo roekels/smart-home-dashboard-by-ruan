@@ -11,11 +11,13 @@ const ICON: Record<string, string> = { brain: "brain", calendar: "calendar", hom
 
 /** What "change" means for a service. A service not listed here gets the general line. */
 const WRITE: Record<string, string> = {
+  calendar: "Add and change events there, each with a card first. Removing stays off.",
   home: "Switch lights and scenes and tick off list items at once. Anything marked risky (plugs, commands) stays off.",
   finance: "File balances, contracts and receipts, each with a card first. Admins only.",
   health: "File what a person tells it about their own records, each with a card first. Someone else's only when an admin asks in writing. Nothing clinical goes into the notes.",
 };
 const READ: Record<string, string> = {
+  calendar: "See events in the calendar of the person who is asking and in the shared one.",
   finance: "See accounts, contracts and deadlines, for admins only.",
   health: "See the records of the person who is asking, to avoid filing something twice.",
 };
@@ -72,6 +74,8 @@ function serviceCards(s: AlfredSettings): Raw {
       <span><b>${t("Read")}</b><small class="muted">${t(READ[g.id] ?? "Look things up and read them.")}</small></span></label>
     <label class="al-row"><input type="checkbox" data-perm="${g.id}.write">
       <span><b>${t("Change")}</b><small class="muted">${t(WRITE[g.id] ?? "Add and change things. Each change shows a card first; deleting stays off.")}</small></span></label>
+    ${g.id === "calendar" ? html`<label class="al-row"><input type="checkbox" data-flag="adminCalendars">
+      <span><b>${t("Admins can open everyone's calendars")}</b><small class="muted">${t("Off: each person reaches their own calendar and the shared one. On: an admin may also ask about another person's calendar by name. Everyone else stays with their own.")}</small></span></label>` : ""}
   </section>`)}`;
 }
 
@@ -127,8 +131,10 @@ export function alfredSettingsInit(): void {
       drawn = key;
       mount($("#al-services")!, serviceCards(s));
       $$<HTMLInputElement>("[data-perm]").forEach((b) => b.addEventListener("change", () => void save({ permissions: { [b.dataset.perm!]: b.checked } }, () => { b.checked = !b.checked; })));
+      $$<HTMLInputElement>("[data-flag='adminCalendars']").forEach((b) => b.addEventListener("change", () => void save({ adminCalendars: b.checked }, () => { b.checked = !b.checked; })));
     }
     $$<HTMLInputElement>("[data-perm]").forEach((b) => { b.checked = s.permissions[b.dataset.perm!] !== false; });
+    $$<HTMLInputElement>("[data-flag='adminCalendars']").forEach((b) => { b.checked = s.adminCalendars === true; });
   };
 
   const save = async (change: SettingsChange, undo: () => void) => {

@@ -18,7 +18,7 @@ export { Registry } from "./registry.ts";
  *   GET  /v1/conversations         the person's recent conversations
  *   GET  /v1/conversations/:id     one conversation's turns and waiting writes
  *   GET  /v1/settings              everyone: the assistant's name. Admins: everything on the settings page
- *   POST /v1/settings              admins: { name?, persona?, permissions?: { "brain.read": bool, … }, fast? }
+ *   POST /v1/settings              admins: { name?, persona?, permissions?: { "brain.read": bool, … }, fast?, adminCalendars? }
  *   GET  /v1/tools                 admins: every tool with its mode (auto / confirm / off)
  *   GET  /v1/usage, /v1/traces     admins: tokens per day; where the last turns spent their time
  *   GET  /v1/health                no person needed: is it set up? Names what is missing, never a value

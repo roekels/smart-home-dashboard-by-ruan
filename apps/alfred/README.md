@@ -65,9 +65,10 @@ raised to "needs a card" at most, never to "runs".
   person who is signed in. A call that names someone else is refused, except as below.
 - **Someone else's records** can only be written by an admin who asked for it in their own words. Those words are
   quoted on the card, with whose records it is for.
-- **Calendars**: a person reaches their own calendar and the shared one through the assistant, never another
-  person's, whatever the gateway key could reach. This is checked in the Worker (`src/scope.ts`), not left to the
-  prompt.
+- **Calendars**: a person reaches their own calendar and the shared one through the assistant, whatever the gateway
+  key could reach. This is checked in the Worker (`src/scope.ts`), not left to the prompt. One setting changes it:
+  "Admins can open everyone's calendars" on Assistant settings, off by default. With it on, an admin may ask about
+  another person's calendar by name; nothing of it is fetched unasked, and everyone else stays with their own.
 - **A health conversation leaves no text behind** outside the conversation itself: its trace line reads
   `[health, not traced]` and its title is "Health".
 - **Nothing clinical goes into the notes.** A note written from a health conversation always shows a card, marked
