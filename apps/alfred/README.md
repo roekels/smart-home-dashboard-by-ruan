@@ -53,7 +53,7 @@ Three layers, each only narrowing the one before:
 | read-only | runs |
 | a change on the `home` service (a light, a scene, a list item) | runs: quick to undo |
 | any other change | a card shows what would be written; it runs only after Approve |
-| marked destructive (plugs, delete, device commands) | not offered at all |
+| marked destructive (plugs, device commands), or named archive, delete or remove | not offered at all |
 
 `ALFRED_TOOL_POLICY` (a JSON var, `{ "home__set_plug": "confirm" }`) can change one tool. A destructive tool can be
 raised to "needs a card" at most, never to "runs".
