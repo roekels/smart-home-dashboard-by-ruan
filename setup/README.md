@@ -107,8 +107,8 @@ Rules:
 - A Worker every module can bind to: `shell`, `gateway`, or any `app` a module file declares.
 - Do not write `wrangler.jsonc` by hand and do not edit `wrangler-config.mjs` for a module: add the module file and
   run `node setup/wrangler-config.mjs`. A module that is off is left out of the shell's and gateway's config.
-- The committed `wrangler.jsonc` files are rendered from `household.config.example.json`, where only Brain and data
-  export are on. To see your module's config locally, switch it on in a scratch `household.config.json` (do not
+- The committed `wrangler.jsonc` files are rendered from `household.config.example.json`, where only Brain is on.
+  To see your module's config locally, switch it on in a scratch `household.config.json` (do not
   commit that file).
 - Which module needs which stays in `MODULE_NEEDS` (packages/core/src/household.ts), not in the module file.
 - Several modules may add to the same shell store: declare the store in one module file and bind it from the

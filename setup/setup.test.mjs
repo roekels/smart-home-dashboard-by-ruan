@@ -17,8 +17,9 @@ import { handover } from "./handover.mjs";
 
 const read = (p) => JSON.parse(readFileSync(new URL("../" + p, import.meta.url), "utf8"));
 const example = read("household.config.example.json");
-// brain is on in the example and has a module file; these tests are about the core, so it is off here
-const config = { ...example, household: "Maple family", domain: "home.maple.example", resourcePrefix: "maple", modules: { ...example.modules, brain: false } };
+// brain is on in the example and has a module file; these tests are about the core, so it is off here.
+// dataExport is on to stand for a module that is switched on but has no module file yet.
+const config = { ...example, household: "Maple family", domain: "home.maple.example", resourcePrefix: "maple", modules: { ...example.modules, brain: false, dataExport: true } };
 const core = read("setup/modules/core.json");
 const ACCOUNT = "a".repeat(32);
 const DAY = 86_400_000;
