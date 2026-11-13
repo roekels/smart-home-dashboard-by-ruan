@@ -1,6 +1,6 @@
 # Shell
 
-The dashboard Worker (`<prefix>-shell`) and its pages: sign-in, Today, Settings and Security. It knows nothing about
+The dashboard Worker (`<prefix>-shell`) and its pages: sign-in, Today, Settings, Security and the one-time key page. It knows nothing about
 notes, calendars or money. Those are modules that register with it, and they exist only where the household config
 switches them on.
 
@@ -17,6 +17,7 @@ switches them on.
 | `/dashboard/security` | who signs in where, what talks to what, where each key lives | admins |
 | `/api/me` | the person, their menu, which modules are on | every person |
 | `/api/security` | the Security page's content | admins |
+| `/api/setup/keys` | the one-time key page: which keys are stored, and storing them once | admins |
 | `/api/<module>/*` | a module's API | as the module decides |
 | `/favicon.svg`, `/manifest.webmanifest`, `/apple-touch-icon.png` | the icon, in each person's colour | every person |
 
@@ -42,6 +43,7 @@ change something.
 | `src/pages.ts` | which paths exist and who may open them; the menu per person |
 | `src/modules.ts` | the list of modules built into the Worker (see below) |
 | `src/security.ts` | builds the Security page from the household config and `secrets.manifest.json` |
+| `src/setup-keys.ts` | the key page's API: stores browser-made encryption keys as Worker secrets, then locks (see `setup/README.md`) |
 | `src/login.ts`, `src/app-icon.ts` | the sign-in page; the per-person icon and manifest |
 | `src/demo.ts` | demo mode |
 | `web/` | the UI: plain TypeScript and CSS, no framework. `npm run build` compiles it into `public/` |

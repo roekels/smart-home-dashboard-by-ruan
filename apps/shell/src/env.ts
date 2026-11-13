@@ -10,6 +10,8 @@ export interface Env {
   /** Var "on": serve the made-up family from demo/ to anyone, with no sign-in. Nothing real is read or written.
    *  For previews and screenshots only; never set on a household's own dashboard. */
   DEMO_MODE?: string;
+  /** Secret, during setup only: the key page's pass (setup-keys.ts). Set by setup/keys.mjs, deleted by the page. */
+  SETUP_KEYPAGE_WRITE_TOKEN?: string;
   /** wrangler dev only (git-ignored .dev.vars): an email from the household config to act as, skipping Access. */
   DEV_EMAIL?: string;
 }

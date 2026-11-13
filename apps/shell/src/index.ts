@@ -3,6 +3,7 @@
 //   /                     -> /home
 //   /api/me               who is signed in, their menu, which modules are on
 //   /api/security         the Security page's content (admins)
+//   /api/setup/keys       the one-time key page (admins; setup-keys.ts)
 //   /api/<module>/*       a module's API (modules.ts); 404 when the module is off or not built in
 //   everything else       the UI, behind the sign-in; page paths get index.html (the client router picks the page)
 // Paths the gateway owns (/…/mcp, /oauth/*, /.well-known/*) are Worker routes of <prefix>-gateway and win over this
@@ -19,6 +20,7 @@ import { loginPage } from "./login.ts";
 import { builtModules, MODULES, type ShellModule } from "./modules.ts";
 import { APP_ICON, menuFor, pageAccess } from "./pages.ts";
 import { securityModel, type ManifestSecret } from "./security.ts";
+import { keyPageApi } from "./setup-keys.ts";
 
 const isDemo = (env: Env): boolean => env.DEMO_MODE === "on";
 
@@ -63,6 +65,9 @@ async function api(req: Request, env: Env, url: URL, h: Household, person: Perso
     }));
   }
   const write = sameOriginWrite(req, url);
+  if (p === "/api/setup/keys") {
+    return keyPageApi({ req, person, write, manifest: manifest.secrets as ManifestSecret[], passText: demo ? undefined : env.SETUP_KEYPAGE_WRITE_TOKEN });
+  }
   if (demo) return demoApi(req, url, person, write);
   if (req.method !== "GET" && req.method !== "HEAD" && !write) throw new HttpError(403, "cross-site write refused");
   const segment = p.split("/")[2] ?? "";

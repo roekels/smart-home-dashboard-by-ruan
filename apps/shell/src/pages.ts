@@ -6,6 +6,7 @@ import { builtModules, MODULES, type PageDef, type ShellModule } from "./modules
 export const CORE_PAGES: PageDef[] = [
   { path: "/home", label: "Today", icon: "sun", where: "home" },
   { path: "/dashboard/security", label: "Security", icon: "shield", where: "manage", text: "Who signs in where, what talks to what, and where each key lives." },
+  { path: "/setup/keys", label: "Encryption keys", icon: "key", where: "manage", text: "Made once, in your browser, during setup. Nobody else sees them." },
 ];
 export const SETTINGS = "/settings";
 

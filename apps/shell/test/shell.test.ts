@@ -41,13 +41,13 @@ test("pages: the gateway's paths are never a page", () => {
 test("modules: pages exist only when the module is on and built in", () => {
   assert.equal(pageAccess("/home/calendar", H, [calendar]), "private");
   assert.equal(pageAccess("/dashboard/finance", H, [calendar, finance]), "none", "finance is off in this config");
-  assert.deepEqual(allPages(H, [calendar, finance]).map((p) => p.path), ["/home", "/dashboard/security", "/home/calendar", "/dashboard/calendar-sync"]);
+  assert.deepEqual(allPages(H, [calendar, finance]).map((p) => p.path), ["/home", "/dashboard/security", "/setup/keys", "/home/calendar", "/dashboard/calendar-sync"]);
 });
 
 test("menu: Home for everyone, management for admins only", () => {
   const admin = menuFor(H, alex, [calendar]);
   assert.deepEqual(admin.nav.map((g) => [g.group, g.items.map((i) => i.path)]), [["Home", ["/home", "/home/calendar"]]]);
-  assert.deepEqual(admin.manage.map((m) => m.path), ["/dashboard/security", "/dashboard/calendar-sync"]);
+  assert.deepEqual(admin.manage.map((m) => m.path), ["/dashboard/security", "/setup/keys", "/dashboard/calendar-sync"]);
   const member = menuFor(H, sam, [calendar]);
   assert.deepEqual(member.nav[0].items.map((i) => i.path), ["/home", "/home/calendar"]);
   assert.deepEqual(member.manage, []);

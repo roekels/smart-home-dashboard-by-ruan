@@ -11,12 +11,25 @@ stand-in; **they have not yet been run against a live account**, so always start
 | `provision.mjs` | creates stores and Access applications, writes `resources.json` and the wrangler configs; reuses what exists | yes |
 | `deploy.mjs` | first deploy of the Workers with the setup token | yes |
 | `secrets.mjs --dry-run` / `secrets.mjs` | makes the machine-made secrets (service tokens, gateway keys) and sets them on the Workers without printing them; lists what the person and the key page still owe | yes |
+| `keys.mjs open` / `keys.mjs close` | opens the one-time key page with a token that can only edit Worker secrets (24 hours), and removes it again; never sees a key | yes |
 | `verify.mjs` | checks the live dashboard from outside, with no credentials | no |
+| `handover.mjs` | passes only when the full setup token no longer works | no |
 | `teardown.mjs --dry-run` / `--confirm "<household>"` | removes what the setup created, data included | yes |
 | `wrangler-config.mjs` | renders every `apps/*/wrangler.jsonc` from the config, `resources.json` and the module files | writes files |
 | `check-manifest.mjs`, `scrub-check.mjs` | `npm run check` | no |
 
 The setup token is read from the environment secret `SETUP_CLOUDFLARE_FULL_TOKEN` and is never printed.
+
+## Encryption keys and the key page
+
+A secret marked `key-page` in `secrets.manifest.json` is made in the admin's browser on `/setup/keys`
+(`apps/shell/src/setup-keys.ts`, `apps/shell/web/src/pages/setup-keys.ts`), shown once, and stored by the dashboard
+Worker on the Worker named in the module file's `secrets` list. Formats, fixed for every module:
+
+- a name ending in `_KEY`: 32 random bytes as standard base64 (44 characters);
+- a name ending in `_PASSPHRASE`: five groups of five letters and digits joined by dashes.
+
+A key that is already set is never replaced, and the page locks itself once every key is stored.
 
 ## Module files: `setup/modules/<module>.json`
 

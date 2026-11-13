@@ -12,6 +12,8 @@ import { verify } from "./verify.mjs";
 import { deployOrder, deploySteps } from "./deploy.mjs";
 import { machineSecretsFor, sha256 } from "./secrets.mjs";
 import { render } from "./wrangler-config.mjs";
+import { KEYPAGE_SECRET, closeKeyPage, openKeyPage } from "./keys.mjs";
+import { handover } from "./handover.mjs";
 
 const read = (p) => JSON.parse(readFileSync(new URL("../" + p, import.meta.url), "utf8"));
 const example = read("household.config.example.json");
@@ -26,7 +28,7 @@ function fakeCloudflare(over = {}) {
   const state = {
     token: { status: "active", expires_on: new Date(NOW + 3 * DAY).toISOString() },
     zones: [{ id: "z1", name: "maple.example", status: "active", account: { id: ACCOUNT } }],
-    team: "maple-team", d1: [], kv: [], r2: [], r2On: true, apps: [], policies: {}, tokens: [], secrets: {}, sql: [], workers: [],
+    team: "maple-team", d1: [], kv: [], r2: [], r2On: true, apps: [], policies: {}, tokens: [], secrets: {}, sql: [], workers: [], apiTokens: [], mayMakeTokens: true,
     ...over,
   };
   const calls = [];
@@ -59,6 +61,10 @@ function fakeCloudflare(over = {}) {
     if ((m = path.match(`^${a}/access/service_tokens/([^/]+)/rotate$`))) { const t = state.tokens.find((x) => x.id === m[1]); t.client_secret = "rotated-" + id(8); return ok(t); }
     if ((m = path.match(`^${a}/access/service_tokens/([^/]+)$`)) && method === "DELETE") { state.tokens = state.tokens.filter((x) => x.id !== m[1]); return ok(null); }
     if ((m = path.match(`^${a}/workers/scripts/([^/]+)/secrets$`))) { const list = (state.secrets[m[1]] ??= {}); if (method === "GET") return ok(Object.keys(list).map((name) => ({ name, type: "secret_text" }))); list[body.name] = body.text; return ok({ name: body.name }); }
+    if ((m = path.match(`^${a}/workers/scripts/([^/]+)/secrets/([^/]+)$`)) && method === "DELETE") { delete state.secrets[m[1]]?.[m[2]]; return ok(null); }
+    if (path === "/user/tokens/permission_groups") return ok([{ id: "p".repeat(32), name: "Workers Scripts Read" }, { id: "w".repeat(32), name: "Workers Scripts Write" }]);
+    if (path === "/user/tokens") { if (method === "GET") return ok(state.apiTokens.map(({ value, ...t }) => t)); if (!state.mayMakeTokens) return err(403, "Unauthorized to access requested resource"); const t = { ...body, id: id(32), value: "narrow-" + id(8) }; state.apiTokens.push(t); return ok(t); }
+    if ((m = path.match("^/user/tokens/([^/]+)$")) && method === "DELETE") { state.apiTokens = state.apiTokens.filter((t) => t.id !== m[1]); return ok(null); }
     if ((m = path.match(`^${a}/workers/scripts/([^/]+)$`)) && method === "DELETE") { state.workers.push(m[1]); return ok(null); }
     return err(404, `the stand-in has no ${method} ${path}`);
   };
@@ -276,4 +282,57 @@ test("teardown: removes only this household's things; a dry run removes nothing"
   assert.deepEqual(f.state.kv, []);
   assert.deepEqual(f.state.apps, []);
   assert.deepEqual(f.state.workers.sort(), ["maple-gateway", "maple-shell"]);
+});
+
+// A made-up module with keys the key page makes.
+const vault = { module: "health", workers: [{ app: "vault" }], secrets: [{ name: "HEALTH_DATA_ENCRYPTION_KEY", app: "vault" }, { name: "EXPORT_ZIP_PASSPHRASE", app: "shell" }] };
+const withVault = { ...config, modules: { ...config.modules, health: true } };
+
+test("key page: open makes a narrow one-day token and hands it only to the Worker; close removes both", async () => {
+  const f = fakeCloudflare();
+  const input = () => ({ cf: f.cf(), plan: buildPlan(withVault, { core, health: vault }), resources: { accountId: ACCOUNT }, manifest: read("secrets.manifest.json"), now: NOW });
+  const opened = await openKeyPage(input());
+  assert.equal(opened.state, "open");
+  assert.equal(opened.address, "https://home.maple.example/setup/keys");
+  const token = f.state.apiTokens[0];
+  assert.equal(token.name, "maple-setup-keypage");
+  assert.deepEqual(token.policies, [{ effect: "allow", resources: { [`com.cloudflare.api.account.${ACCOUNT}`]: "*" }, permission_groups: [{ id: "w".repeat(32) }] }]);
+  assert.equal(token.expires_on, "2026-01-11T00:00:00Z");
+  const pass = JSON.parse(f.state.secrets["maple-shell"][KEYPAGE_SECRET]);
+  assert.equal(pass.token, token.value);
+  assert.deepEqual(pass.keys, [{ name: "HEALTH_DATA_ENCRYPTION_KEY", worker: "maple-vault" }, { name: "EXPORT_ZIP_PASSPHRASE", worker: "maple-shell" }]);
+  assert.equal(JSON.stringify(opened).includes(token.value), false, "the token's value is not in what the script reports");
+
+  // opening again replaces the token instead of leaving two
+  await openKeyPage(input());
+  assert.equal(f.state.apiTokens.length, 1);
+
+  const early = await closeKeyPage(input());
+  assert.equal(early.ok, false);
+  assert.deepEqual(early.missing.map((k) => k.name), ["HEALTH_DATA_ENCRYPTION_KEY", "EXPORT_ZIP_PASSPHRASE"]);
+  assert.equal(f.state.apiTokens.length, 0);
+  assert.equal(KEYPAGE_SECRET in f.state.secrets["maple-shell"], false);
+
+  f.state.secrets["maple-vault"] = { HEALTH_DATA_ENCRYPTION_KEY: "x" };
+  f.state.secrets["maple-shell"].EXPORT_ZIP_PASSPHRASE = "y";
+  assert.equal((await closeKeyPage(input())).ok, true);
+  assert.equal((await openKeyPage(input())).state, "done", "keys that are stored are never made again");
+});
+
+test("key page: nothing to do without key-page secrets; a dry run changes nothing; a token that cannot make tokens is explained", async () => {
+  const f = fakeCloudflare();
+  assert.equal((await openKeyPage({ cf: f.cf(), plan: buildPlan(config), resources: { accountId: ACCOUNT }, now: NOW })).state, "nothing");
+  const dry = await openKeyPage({ cf: f.cf(true), plan: buildPlan(withVault, { core, health: vault }), resources: { accountId: ACCOUNT }, now: NOW });
+  assert.equal(dry.state, "open");
+  assert.equal(f.calls.filter((c) => c.method !== "GET").length, 0);
+  const g = fakeCloudflare({ mayMakeTokens: false });
+  await assert.rejects(openKeyPage({ cf: g.cf(), plan: buildPlan(withVault, { core, health: vault }), resources: { accountId: ACCOUNT }, now: NOW }), /may not create other tokens/);
+});
+
+test("handover: passes only when the full token is gone", async () => {
+  assert.equal((await handover({ token: "" })).gone, true);
+  const f = fakeCloudflare();
+  assert.equal((await handover({ token: "test-token", fetch: f.fetch })).gone, false);
+  f.state.token = null;
+  assert.equal((await handover({ token: "test-token", fetch: f.fetch })).gone, true);
 });
