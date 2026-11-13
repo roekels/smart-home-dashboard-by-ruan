@@ -24,13 +24,15 @@ export interface AlfredSettings {
   persona: string;
   permissions: Record<string, boolean>;
   fast: boolean;
+  /** Admins may open every person's calendar through the assistant. Off by default. */
+  adminCalendars: boolean;
   services: { id: string; name: string }[];
   down: string[];
   model: string;
   effort: string;
   usage: { today: number; limit: number | null };
 }
-export type SettingsChange = Partial<Pick<AlfredSettings, "name" | "persona" | "permissions" | "fast">>;
+export type SettingsChange = Partial<Pick<AlfredSettings, "name" | "persona" | "permissions" | "fast" | "adminCalendars">>;
 
 /** One turn as the assistant recorded it (events.ts Trace): where the time and the tokens went. */
 export interface AlfredTrace {

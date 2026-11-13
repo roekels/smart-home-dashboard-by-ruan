@@ -8,8 +8,9 @@
  *   finance  Admins only (like the Finance page). A row owned by another person needs the speaker's written request;
  *            shared rows ("joint") do not.
  *
- *   calendar Everyone reaches their own calendar and the shared one, never another person's. Calls that take a list
- *            of `calendars` are cut down to those two; a call that names another person's `calendar` is refused.
+ *   calendar Everyone reaches their own calendar and the shared one. Calls that take a list of `calendars` are cut
+ *            down to those two; a call that names another person's `calendar` is refused. One exception, off by
+ *            default: with the setting "admins can open everyone's calendars", an admin may name any calendar.
  *
  * "Asked in writing" is checked, not trusted: the model must quote the speaker's own words in `other_person_request`,
  * and the quote must really be in one of their messages in this conversation. A write then shows a card that names
@@ -50,14 +51,17 @@ export type Scoped =
   | { ok: true; input: Record<string, unknown>; other: ForOther | null }
   | { ok: false; reason: string };
 
+/** What the household switched on (settings.ts). */
+export interface ScopeRules { adminCalendars?: boolean }
+
 export interface ScopeTool { server: string; inputSchema?: Record<string, unknown> }
 
 /**
  * Check one tool call against the rules above. Returns the input to run (with the speaker filled in where the tool
  * takes a `person`), plus who else it is for, or the reason it is refused (handed to the model as the tool's error).
  */
-export function scopeCall(h: Household, speaker: Person, t: ScopeTool, input: Record<string, unknown>, said: string[]): Scoped {
-  if (t.server === CALENDAR) return calendarCall(h, speaker, t, input);
+export function scopeCall(h: Household, speaker: Person, t: ScopeTool, input: Record<string, unknown>, said: string[], rules: ScopeRules = {}): Scoped {
+  if (t.server === CALENDAR) return calendarCall(h, speaker, t, input, rules.adminCalendars === true && speaker.admin);
   if (!PERSONAL.has(t.server)) return { ok: true, input, other: null };
   if (ADMIN_ONLY.has(t.server) && !speaker.admin) return { ok: false, reason: `${t.server} is only open to the household's admins.` };
 
@@ -85,8 +89,11 @@ const CALENDAR = "calendar";
 
 /** Calendars: the speaker's own and the shared one. The gateway key may reach more; this is what keeps one person's
  *  diary out of another person's chat. Also used for the calendar fetched up front (context.ts). */
-function calendarCall(h: Household, speaker: Person, t: ScopeTool, input: Record<string, unknown>): Scoped {
-  const mine = [speaker.id, SHARED_CALENDAR];
+function calendarCall(h: Household, speaker: Person, t: ScopeTool, input: Record<string, unknown>, everyone: boolean): Scoped {
+  // `own`: what is read when no calendar is named. `mine`: what may be named. They differ only for an admin in a
+  // household that opened everyone's calendars to its admins: asked for by name, never fetched unasked.
+  const own = [speaker.id, SHARED_CALENDAR];
+  const mine = everyone ? [...new Set([...own, ...h.people.map((p) => p.id)])] : own;
   const refuse = (id: string): Scoped => {
     const who = personNamed(h, id);
     return { ok: false, reason: `${who ? `${who.name}'s calendar` : `The calendar "${id}"`} is not open here. ${speaker.name} reaches their own calendar and the shared one.` };
@@ -95,9 +102,9 @@ function calendarCall(h: Household, speaker: Person, t: ScopeTool, input: Record
   if (typeof input.calendar === "string" && !mine.includes(input.calendar.trim().toLowerCase())) return refuse(input.calendar);
   if ("calendars" in obj(obj(t.inputSchema).properties)) {
     const asked = Array.isArray(input.calendars) ? input.calendars.filter((c): c is string => typeof c === "string").map((c) => c.trim().toLowerCase()) : null;
-    const kept = asked ? asked.filter((c) => mine.includes(c)) : mine;
+    const kept = asked ? asked.filter((c) => mine.includes(c)) : own;
     if (asked && asked.length && !kept.length) return refuse(asked[0]);
-    out = { ...input, calendars: kept.length ? kept : mine };
+    out = { ...input, calendars: kept.length ? kept : own };
   }
   return { ok: true, input: out, other: null };
 }

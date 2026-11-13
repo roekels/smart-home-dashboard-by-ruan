@@ -138,6 +138,9 @@ test("demo: settings are for admins; everyone may learn the name", async () => {
   const saved: any = await (await post("/api/alfred/settings", { name: "Juniper", permissions: { "brain.write": false } }, admin.id)).json();
   assert.equal(saved.name, "Juniper");
   assert.equal(saved.permissions["brain.write"], false);
+  assert.equal(saved.adminCalendars, false, "off until an admin switches it on");
+  assert.equal(((await (await post("/api/alfred/settings", { adminCalendars: true }, admin.id)).json()) as any).adminCalendars, true);
+  await post("/api/alfred/settings", { adminCalendars: false }, admin.id);
   assert.ok(saved.services.length > 0);
   assert.equal(((await (await get("/api/alfred/settings", member.id)).json()) as any).name, "Juniper");
   const traces: any = await (await get("/api/alfred/traces", admin.id)).json();
