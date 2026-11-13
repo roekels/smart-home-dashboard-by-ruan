@@ -10,23 +10,25 @@ import { fileURLToPath } from "node:url";
 
 const SAFE_DOMAINS = /(^|\.)(example\.(com|org|net)|example|test|invalid|localhost)$/i;
 // Public hosts the code and docs may name.
-const KNOWN_HOSTS = /(^|\.)(cloudflare\.com|cloudflareaccess\.com|workers\.dev|github\.com|githubusercontent\.com|anthropic\.com|claude\.ai|claude\.com|apple\.com|icloud\.com|home-assistant\.io|json-schema\.org|npmjs\.com|nodejs\.org|w3\.org|openai\.com|chatgpt\.com|mozilla\.org|opensource\.org)$/i;
+const KNOWN_HOSTS = /(^|\.)(cloudflare\.com|cloudflareaccess\.com|workers\.dev|github\.com|githubusercontent\.com|anthropic\.com|claude\.ai|claude\.com|apple\.com|icloud\.com|home-assistant\.io|json-schema\.org|npmjs\.com|nodejs\.org|w3\.org|openai\.com|chatgpt\.com|mozilla\.org|opensource\.org|sil\.org|modelcontextprotocol\.io)$/i;
 
 const RULES = [
   { id: "email", re: /[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)/g, bad: (m) => !SAFE_DOMAINS.test(m[1]) && !/^(noreply|git)@/i.test(m[0]) },
   { id: "url-host", re: /https?:\/\/([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)/g, bad: (m) => !SAFE_DOMAINS.test(m[1]) && !KNOWN_HOSTS.test(m[1]) && !/^\d+(\.\d+){3}$/.test(m[1]) },
-  { id: "hex-id-32", re: /\b[0-9a-f]{32}\b/g, bad: () => true },
-  { id: "hex-id-64", re: /\b[0-9a-f]{64}\b/g, bad: () => true },
+  // All zeros is the placeholder for an id the setup fills in (setup/resources.example.json).
+  { id: "hex-id-32", re: /\b[0-9a-f]{32}\b/g, bad: (m) => !/^0+$/.test(m[0]) },
+  { id: "hex-id-64", re: /\b[0-9a-f]{64}\b/g, bad: (m) => !/^0+$/.test(m[0]) },
   { id: "uuid", re: /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g, bad: (m) => !/^0{8}-0{4}-0{4}-0{4}-0{12}$/.test(m[0]) },
   { id: "private-ip", re: /\b(?:10\.\d{1,3}|192\.168|172\.(?:1[6-9]|2\d|3[01]))\.\d{1,3}\.\d{1,3}\b/g, bad: () => true },
   { id: "mac-address", re: /\b[0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2}){5}\b/g, bad: (m) => !/^00(:00){5}$/.test(m[0]) },
   { id: "private-key", re: /-----BEGIN [A-Z ]*PRIVATE KEY-----/g, bad: () => true },
   { id: "jwk-private", re: /"d"\s*:\s*"[A-Za-z0-9_-]{20,}"/g, bad: () => true },
-  { id: "api-key", re: /\b(sk-ant-[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|cfat_[A-Za-z0-9_-]{10,}|fmcp_[a-z0-9-]+_[A-Za-z0-9_-]{20,})/g, bad: () => true },
+  { id: "api-key", re: /\b(sk-ant-[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|cfat_[A-Za-z0-9_-]{10,}|hmcp_[a-z0-9-]+_[A-Za-z0-9_-]{20,})/g, bad: () => true },
   { id: "access-team", re: /\b([a-z0-9-]+)\.cloudflareaccess\.com\b/g, bad: (m) => m[1] !== "example" && m[1] !== "your-team" },
 ];
 
-const SKIP_DIRS = new Set([".git", "node_modules", ".wrangler", "dist"]);
+// apps/shell/public is the built UI (git-ignored); its sources under apps/shell/web are scanned.
+const SKIP_DIRS = new Set([".git", "node_modules", ".wrangler", "dist", "public"]);
 const BINARY = /\.(png|jpe?g|gif|webp|ico|woff2?|ttf|pdf|zip|gz|dmg|exe)$/i;
 const LOCKFILE = /(^|\/)package-lock\.json$/;
 

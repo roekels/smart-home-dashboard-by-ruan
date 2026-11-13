@@ -1,0 +1,20 @@
+{
+  "name": "shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The dashboard Worker: sign-in, Today, Settings, Security, and the modules that are switched on. No runtime dependencies.",
+  "scripts": {
+    "build": "node scripts/build-web.mjs",
+    "dev": "npm run build && wrangler dev",
+    "demo": "npm run build && node scripts/demo-server.mjs",
+    "typecheck": "tsc -p . --noEmit && tsc -p web --noEmit",
+    "test": "node --test",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261031.1",
+    "typescript": "^6.0.2",
+    "wrangler": "^4.156.0"
+  }
+}

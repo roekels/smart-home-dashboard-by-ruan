@@ -1,0 +1,15 @@
+{
+  "$comment": "Made-up health reminders per person id: what Today's 'For you' card shows. in_days = days from today (negative = overdue).",
+  "mine": {
+    "alex": {
+      "vaccinations_due": [{ "id": "hx_demo1", "for": "Tetanus", "in_days": -40 }],
+      "current_meds": [{ "id": "hm_demo1", "name": "Vitamin D", "dose": "1 tablet", "schedule": "daily" }],
+      "follow_ups": [{ "id": "hv_demo1", "what": "Dentist", "days_ago": 12, "follow_up": "Book the hygienist" }]
+    },
+    "sam": {
+      "vaccinations_due": [{ "id": "hx_demo2", "for": "Flu", "in_days": 21 }],
+      "current_meds": [],
+      "follow_ups": []
+    }
+  }
+}

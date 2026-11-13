@@ -1,0 +1,9 @@
+{
+  "$comment": "Ids of the Cloudflare resources the setup creates. None of them is a secret. Copy to setup/resources.json, fill in the real ids, then run: node setup/wrangler-config.mjs",
+  "accessTeam": "your-team",
+  "accessAud": "0000000000000000000000000000000000000000000000000000000000000000",
+  "gateway": {
+    "d1DatabaseId": "00000000-0000-0000-0000-000000000000",
+    "kvNamespaceId": "00000000000000000000000000000000"
+  }
+}

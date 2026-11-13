@@ -1,0 +1,18 @@
+{
+  "$comment": "Made-up events. day = days after today. owner = a person id from demo/household.config.json, or null for the shared calendar. A title in round brackets is an idea, not fixed.",
+  "shared": "Family",
+  "events": [
+    { "day": 0, "start": "07:30", "end": "08:00", "owner": "sam", "title": "School run" },
+    { "day": 0, "start": "09:00", "end": "10:00", "owner": "alex", "title": "Team planning" },
+    { "day": 0, "start": "12:30", "end": "13:15", "owner": "alex", "title": "Lunch with Jo", "location": "Corner Cafe" },
+    { "day": 0, "start": "16:00", "end": "17:00", "owner": "robin", "title": "Football practice", "location": "Sports ground" },
+    { "day": 0, "start": "18:30", "end": "21:00", "owner": null, "title": "(Dinner with the neighbours)", "location": "Number 12" },
+    { "day": 0, "owner": null, "title": "Recycling day" },
+    { "day": 1, "start": "08:15", "end": "08:45", "owner": "alex", "title": "Dentist", "location": "High Street Dental" },
+    { "day": 1, "start": "17:30", "end": "18:30", "owner": "sam", "title": "Parents' evening", "location": "School, room 4" },
+    { "day": 1, "start": "19:00", "end": "20:00", "owner": "kit", "title": "Piano lesson" },
+    { "day": 2, "start": "10:00", "end": "13:00", "owner": null, "title": "(Hike up Beacon Hill)", "location": "Beacon Hill car park" },
+    { "day": 3, "owner": null, "title": "Grandparents visiting" },
+    { "day": 4, "start": "20:00", "end": "22:00", "owner": "sam", "title": "Book club" }
+  ]
+}

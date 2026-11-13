@@ -1,0 +1,9 @@
+{
+  "$comment": "Made-up lists. owner = a person id, or null for a list everyone shares.",
+  "lists": [
+    { "entity": "todo.shopping_list", "name": "Shopping list", "owner": null, "items": ["Milk", "Bread", "Tomatoes", "Dishwasher tablets"] },
+    { "entity": "todo.alex", "name": "Alex's to-dos", "owner": "alex", "items": ["Renew the parking permit", "Call the plumber"] },
+    { "entity": "todo.sam", "name": "Sam's to-dos", "owner": "sam", "items": ["Book the car service", "Return the library books"] },
+    { "entity": "todo.robin", "name": "Robin's to-dos", "owner": "robin", "items": ["Pack the football kit"] }
+  ]
+}

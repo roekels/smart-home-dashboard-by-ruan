@@ -12,6 +12,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm run install:apps
+      - run: npm run typecheck
       - run: npm test
       - run: npm run check
         env:

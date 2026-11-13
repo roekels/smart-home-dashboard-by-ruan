@@ -4,8 +4,13 @@ A private dashboard for your household that runs on your own Cloudflare account,
 (Claude or Codex). Today's calendar, home controls, notes, finances and health records in one place, behind your own
 sign-in, with your data in your own databases.
 
-> **Status: under construction.** This repository currently holds the framework: the layout, the household config,
-> the secrets manifest and the safety checks. The modules and the setup scripts are being added. Do not install yet.
+> **Status: under construction.** Built so far: the core (sign-in, Today, Settings, Security page, demo mode) and
+> the gateway. The other modules and the setup scripts are being added. Do not install yet.
+
+![Today, with the demo family](docs/screenshots/today.png)
+
+Try it without an account: `npm run install:apps`, then `npm run demo`, and open the address it prints. Everything
+you see there is a made-up family.
 
 ## How it works
 
@@ -53,8 +58,11 @@ so your AI never sees them. **If you lose an encryption key, the data it protect
 | `AGENTS.md` | the setup guide your AI follows |
 | `household.config.example.json` | the one file with your household's settings: domain, people, modules |
 | `secrets.manifest.json` | every secret by name: what it is for, where it lives, how to replace it |
-| `setup/` | the checks and (soon) the setup scripts |
-| `apps/`, `modules/`, `agent/` | the Workers, the optional modules and the edge agent |
+| `setup/` | the checks, the generator for the Workers' config files and (soon) the setup scripts |
+| `apps/shell` | the dashboard: sign-in, Today, Settings, Security |
+| `apps/gateway` | the MCP addresses and the OAuth server for your AI apps |
+| `packages/core` | code every Worker shares: the household config, the sign-in check |
+| `apps/`, `modules/`, `agent/` | the other Workers, the optional modules and the edge agent |
 | `docs/` | how it is built and how to fix things |
 | `demo/` | a made-up family's data, for previews and screenshots |
 

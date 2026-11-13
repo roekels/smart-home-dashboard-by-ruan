@@ -4,4 +4,6 @@ node_modules/
 *.local.json
 .wrangler/
 dist/
+# the built UI (apps/shell/scripts/build-web.mjs writes it)
+apps/shell/public/
 .DS_Store

@@ -1,0 +1,24 @@
+/* The sign-in page. Public, so it carries its own small copy of the look and the font (under /login/). */
+@font-face {
+  font-family: "Geist";
+  src: url("/login/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root { color-scheme: light dark; --bg: #e3e6eb; --ink: #14161a; --muted: #666c76; --card: rgba(255, 255, 255, .6); --card-line: rgba(255, 255, 255, .85); --on-ink: #ffffff;
+  --m1: rgba(96, 150, 255, .42); --m2: rgba(110, 210, 205, .36); --m3: rgba(170, 160, 255, .3); --shadow: 0 30px 80px -30px rgba(30, 40, 70, .35); }
+@media (prefers-color-scheme: dark) { :root { --bg: #0c0e13; --ink: #f1f3f6; --muted: #989eaa; --card: rgba(255, 255, 255, .055); --card-line: rgba(255, 255, 255, .08); --on-ink: #101216;
+  --m1: rgba(47, 107, 255, .3); --m2: rgba(30, 150, 150, .22); --m3: rgba(110, 90, 230, .22); --shadow: 0 30px 80px -30px rgba(0, 0, 0, .8); } }
+* { box-sizing: border-box; margin: 0; }
+html, body { min-height: 100%; }
+body { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--bg); color: var(--ink); font: 400 15px/1.5 "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: -.011em; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(58% 52% at 8% 6%, var(--m1), transparent 70%), radial-gradient(48% 46% at 96% 18%, var(--m2), transparent 70%), radial-gradient(60% 55% at 62% 104%, var(--m3), transparent 70%); }
+.login { width: min(380px, 100%); display: grid; justify-items: center; gap: 6px; padding: 40px 32px 32px; text-align: center; border-radius: 28px; background: var(--card); border: 1px solid var(--card-line); box-shadow: var(--shadow); }
+.login__logo { border-radius: 18px; margin-bottom: 14px; }
+h1 { font-size: 26px; font-weight: 600; letter-spacing: -.03em; line-height: 1.2; text-wrap: balance; }
+.login__sub { color: var(--muted); font-size: 14px; }
+.login__btn { display: inline-flex; align-items: center; justify-content: center; height: 46px; width: 100%; margin-top: 26px; border-radius: 999px; background: var(--ink); color: var(--on-ink); font-weight: 500; text-decoration: none; transition: transform .12s; }
+.login__btn:active { transform: scale(.97); }
+.login__btn:focus-visible { outline: 2px solid #2f6bff; outline-offset: 3px; }
+.login__fine { margin-top: 16px; font-size: 12.5px; color: var(--muted); max-width: 30ch; }

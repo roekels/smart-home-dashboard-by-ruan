@@ -1,0 +1,26 @@
+{
+  "$schema": "../setup/household.schema.json",
+  "household": "The Maple family",
+  "domain": "home.example.com",
+  "resourcePrefix": "home",
+  "language": "en",
+  "timezone": "Europe/London",
+  "people": [
+    { "id": "alex", "name": "Alex", "email": "alex@example.com", "admin": true },
+    { "id": "sam", "name": "Sam", "email": "sam@example.com", "admin": true },
+    { "id": "robin", "name": "Robin", "email": "robin@example.com", "admin": false },
+    { "id": "kit", "name": "Kit", "email": "kit@example.com", "admin": false }
+  ],
+  "modules": {
+    "brain": true,
+    "calendar": true,
+    "finance": true,
+    "health": true,
+    "dataExport": true,
+    "homeAssistant": true,
+    "energy": true,
+    "kiosk": true,
+    "edgeAgents": true,
+    "alfred": true
+  }
+}
