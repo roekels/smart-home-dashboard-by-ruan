@@ -5,6 +5,7 @@ import type { Env, Principal } from "./env.ts";
 import type { Service } from "./services.ts";
 import { audit } from "./util.ts";
 import { buildHouseholdServer } from "./tools/household.ts";
+import { buildBrainServer } from "./tools/brain.ts";
 import { buildDevicesServer, buildHomeServer } from "./tools/home.ts";
 import { buildCalendarServer } from "./tools/calendar.ts";
 import { buildFinanceServer } from "./tools/finance.ts";
@@ -30,6 +31,7 @@ const logger = (c: ServerCtx) => (tool: string, ok: boolean, target?: string | n
 
 /** One line per module MCP, keyed by the service id from services.ts. */
 export const SERVERS: Record<string, ServerBuilder> = {
+  brain: (c) => buildBrainServer(c.principal, { h: c.h, brain: c.env.BRAIN, log: logger(c) }),
   calendar: (c) => buildCalendarServer(c.principal, { h: c.h, calendar: c.env.CALENDAR, log: logger(c) }),
   finance: (c) => buildFinanceServer(c.principal, { h: c.h, finance: c.env.FINANCE, log: logger(c) }),
   health: (c) => buildHealthServer(c.principal, { h: c.h, health: c.env.HEALTH, log: logger(c) }),

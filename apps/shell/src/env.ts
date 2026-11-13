@@ -1,3 +1,4 @@
+import type { BrainUiApi } from "../../brain/src/contract.ts";
 import type { CalendarUiApi } from "../../calendar/src/contract.ts";
 
 export interface Env {
@@ -38,6 +39,8 @@ export interface Env {
   SHELL_COMMAND_SIGNING_KEY?: string;
   /** Secret, during setup only: the key page's pass (setup-keys.ts). Set by setup/keys.mjs, deleted by the page. */
   SETUP_KEYPAGE_WRITE_TOKEN?: string;
+  /** Service binding to <prefix>-brain, entrypoint BrainUi: the Brain page, for the signed-in person. */
+  BRAIN?: BrainUiApi;
   /** Service binding to <prefix>-calendar, entrypoint CalendarUi: events for Today and the Calendar page, read only. */
   CALENDAR?: CalendarUiApi;
   /** Service binding to <prefix>-alfred, present only when the alfred module is on (apps/alfred/shell.ts). */

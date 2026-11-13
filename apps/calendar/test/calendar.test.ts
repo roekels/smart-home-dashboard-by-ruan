@@ -122,6 +122,8 @@ test("the dashboard gets every calendar, read only and without notes", async () 
 
   const res = await calendarRoute(new Request("https://home.example.com/api/calendar"), new URL("https://home.example.com/api/calendar?from=2031-06-10&to=2031-06-10"), ui);
   assert.deepEqual(((await res.json()) as { events: { title: string }[] }).events.map((e) => e.title), ["Dentist"]);
+  const wall = await calendarRoute(new Request("https://home.example.com/api/calendar"), new URL("https://home.example.com/api/calendar?from=2031-06-01&to=2031-06-30"), ui, true);
+  assert.deepEqual(((await wall.json()) as { events: { title: string }[] }).events.map((e) => e.title), ["Summer fair"], "a caller that is not a person only sees the shared calendar");
   await assert.rejects(calendarRoute(new Request("https://home.example.com/api/calendar", { method: "POST" }), new URL("https://home.example.com/api/calendar"), ui), /method not allowed/);
   await assert.rejects(calendarRoute(new Request("https://home.example.com/api/calendar"), new URL("https://home.example.com/api/calendar?from=2031-06-10&to=2031-06-10"), undefined), /not connected/);
   assert.equal(calendarModule.pages![0].path, "/home/calendar");

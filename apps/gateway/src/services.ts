@@ -66,6 +66,26 @@ const FINANCE: ServiceDef = {
   }),
 };
 
+const BRAIN: ServiceDef = {
+  module: "brain",
+  path: "/brain/mcp",
+  build: () => ({
+    id: "brain", title: "the Brain", path: "/brain/mcp", prefix: "brain.",
+    scopes: {
+      "brain.read": "Search and read notes",
+      "brain.read.sensitive": "Also read sensitive notes (sealed): yours and the shared ones",
+      "brain.create": "Create new notes; cannot change existing ones",
+      "brain.update": "Edit, move and link notes that are not locked",
+      "brain.write.sensitive": "Create and edit sensitive notes (with create or update)",
+      "brain.archive": "Lock and archive notes, and unlock them (nothing is deleted)",
+    },
+    groups: [
+      { heading: "Read", scopes: ["brain.read", "brain.read.sensitive"] },
+      { heading: "Write", scopes: ["brain.create", "brain.update", "brain.write.sensitive", "brain.archive"] },
+    ],
+  }),
+};
+
 /** Scopes are per calendar and per action: cal.<calendar id>.<read|add|update|remove>. A person's calendar has
  *  their person id; "shared" is the one everyone uses. The same names are checked again in apps/calendar. */
 const CAL_OPS = { read: "see events", add: "add new events", update: "change and confirm events", remove: "remove events" };
@@ -84,7 +104,7 @@ const CALENDAR: ServiceDef = {
 
 /** One entry per module MCP. */
 export const MODULE_SERVICES: ServiceDef[] = [
-  CALENDAR, FINANCE, HEALTH,
+  BRAIN, CALENDAR, FINANCE, HEALTH,
   {
     module: "homeAssistant", path: "/home/mcp",
     build: () => ({

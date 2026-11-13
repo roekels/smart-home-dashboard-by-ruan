@@ -11,7 +11,7 @@ export const CORE_PAGES: PageDef[] = [
 export const SETTINGS = "/settings";
 
 /** Built files the pages load. Behind the sign-in like the pages; /login has its own copies under /login/. */
-const ASSET = /^\/(dist|styles|fonts|icons)\/[A-Za-z0-9._/-]+$/;
+const ASSET = /^\/(dist|styles|fonts|icons|vendor)\/[A-Za-z0-9._/-]+$/;
 /** The app's icons and manifest, drawn per person (app-icon.ts). */
 export const APP_ICON = /^\/(favicon\.svg|apple-touch-icon\.png|manifest\.webmanifest)$/;
 /** Paths the gateway Worker owns through its routes. If one reaches the shell, the route is missing: 404, never a page. */

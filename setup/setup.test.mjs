@@ -17,7 +17,8 @@ import { handover } from "./handover.mjs";
 
 const read = (p) => JSON.parse(readFileSync(new URL("../" + p, import.meta.url), "utf8"));
 const example = read("household.config.example.json");
-const config = { ...example, household: "Maple family", domain: "home.maple.example", resourcePrefix: "maple" };
+// brain is on in the example and has a module file; these tests are about the core, so it is off here
+const config = { ...example, household: "Maple family", domain: "home.maple.example", resourcePrefix: "maple", modules: { ...example.modules, brain: false } };
 const core = read("setup/modules/core.json");
 const ACCOUNT = "a".repeat(32);
 const DAY = 86_400_000;
@@ -89,7 +90,7 @@ test("the zone of a domain is the domain or one of its parents", () => {
 test("plan: core only, with the household's prefix and people", () => {
   const plan = buildPlan(config);
   assert.deepEqual(plan.modules, ["core"]);
-  assert.deepEqual(plan.notBuilt.sort(), ["brain", "dataExport"].filter((m) => !plan.modules.includes(m)).sort());
+  assert.deepEqual(plan.notBuilt, ["dataExport"], "on in the config, no module file yet");
   assert.deepEqual(plan.workers.map((w) => w.name), ["maple-gateway", "maple-shell"]);
   assert.deepEqual(plan.d1.map((d) => d.name), ["maple-gateway"]);
   const family = plan.access.find((a) => a.key === "family");

@@ -6,7 +6,7 @@
       "match": "note|remember|write down|keep in mind",
       "tools": [{ "name": "brain__search", "label": "Brain · search" }],
       "text": "I would add this to the Boiler note under Home.",
-      "card": { "name": "brain__edit", "label": "Brain · edit", "input": { "ref": "Home/Boiler", "append": "Serviced today. Next service due in twelve months.", "summary": "Boiler service noted" } },
+      "card": { "name": "brain__edit", "label": "Brain · edit", "input": { "ref": "Family/Home/Boiler", "append": "Serviced today. Next service due in twelve months.", "summary": "Boiler service noted" } },
       "approved": "Done, the Boiler note now has today's service.",
       "declined": "All right, I left the note as it was."
     },

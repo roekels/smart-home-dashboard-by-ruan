@@ -70,6 +70,26 @@ test("demo: the Health and Finance pages read made-up records and refuse every c
   assert.equal((await post("/api/finance/accounts", { name: "x", kind: "current", owner: "joint" })).status, 403);
 });
 
+test("demo: the Brain answers from made-up notes, read-only, sensitive notes per person", async () => {
+  const graph: any = await (await call("/api/brain/graph")).json();
+  assert.deepEqual(graph.roots, ["Alex", "Sam", "Robin", "Kit", "Family"]);
+  assert.ok(graph.nodes.length > 30 && graph.links.some((l: any) => l.kind === "link"));
+  const ids = new Set(graph.nodes.map((n: any) => n.id));
+  assert.ok(graph.links.every((l: any) => ids.has(l.source) && ids.has(l.target)));
+  // the demo opens as Alex: their own sealed branch shows, Sam's does not
+  assert.ok(graph.nodes.some((n: any) => n.path === "Alex/Health/Knee"));
+  assert.ok(!graph.nodes.some((n: any) => n.path.startsWith("Sam/Health")));
+  const note: any = await (await call("/api/brain/note?path=Family%2FHome%2FBoiler")).json();
+  assert.match(note.body, /^# Boiler/);
+  assert.ok(note.links.some((l: any) => l.path === "Family/Home/Trades we use") && note.backlinks.some((b: any) => b.path === "Family/Home"));
+  assert.equal((await call("/api/brain/note?path=Sam%2FHealth%2FHay%20fever")).status, 400);
+  const hits: any = await (await call("/api/brain/search?q=pancakes")).json();
+  assert.ok(hits.some((x: any) => x.path === "Family/Traditions" && x.snippet.includes("«")));
+  const acts: any = await (await call("/api/brain/activity?since=" + encodeURIComponent(new Date(Date.now() - 864e5).toISOString()))).json();
+  assert.ok(acts.length > 5 && acts[0].ts < acts.at(-1).ts);
+  assert.equal((await post("/api/brain/note/save", { path: "Family/Car", base_version: 1, body: "x" })).status, 403);
+});
+
 test("demo: lists can be changed in memory, with our header only", async () => {
   const before: any = await (await call("/api/lists")).json();
   const list = before.lists[0];

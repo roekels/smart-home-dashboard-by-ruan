@@ -13,6 +13,7 @@
   "preview_urls": false,
   "routes": [
     "home.example.com/household/mcp*",
+    "home.example.com/brain/mcp*",
     "home.example.com/calendar/mcp*",
     "home.example.com/finance/mcp*",
     "home.example.com/health/mcp*",
@@ -36,6 +37,13 @@
     {
       "binding": "OAUTH_KV",
       "id": "00000000000000000000000000000000"
+    }
+  ],
+  "services": [
+    {
+      "binding": "BRAIN",
+      "service": "home-brain",
+      "entrypoint": "Brain"
     }
   ],
   "vars": {

@@ -40,7 +40,8 @@ const DEFS = [...CORE, brain, calendar];
 const withCalendar = parseHousehold({ ...example, modules: { ...example.modules, calendar: true } });
 
 test("services: the core MCP always, a module's MCP only when the module is on", () => {
-  assert.deepEqual(servicesFor(H).map((s) => s.id), ["household"]);
+  const bare = parseHousehold({ ...example, modules: Object.fromEntries(Object.keys(example.modules).map((m) => [m, false])) });
+  assert.deepEqual(servicesFor(bare).map((s) => s.id), ["household"]);
   assert.deepEqual(servicesFor(H, DEFS).map((s) => s.id), ["household", "brain"], "calendar is off in the example");
   assert.deepEqual(servicesFor(withCalendar, DEFS).map((s) => s.id), ["household", "brain", "calendar"]);
 });
@@ -159,7 +160,7 @@ test("consent page: this MCP's scopes only, asked ones ticked, everything escape
 });
 
 test("household MCP: first names and addresses, never emails; refused without the scope", async () => {
-  const services = servicesFor(H);
+  const services = servicesFor(H, CORE);
   const info = householdInfo(H, services, BASE);
   assert.deepEqual(info.people, [{ id: "alex", name: "Alex", admin: true }, { id: "sam", name: "Sam", admin: false }]);
   assert.deepEqual(info.mcps, [{ id: "household", url: `${BASE}/household/mcp`, scopes: ["household.read"] }]);

@@ -12,8 +12,10 @@ import home from "../../../demo/data/home.json" with { type: "json" };
 import lists from "../../../demo/data/lists.json" with { type: "json" };
 import health from "../../../demo/data/health.json" with { type: "json" };
 import finance from "../../../demo/data/finance.json" with { type: "json" };
+import brain from "../../../demo/data/brain.json" with { type: "json" };
 import { type DemoFinance, demoFinanceApi } from "../../../modules/finance/src/demo.ts";
 import { type DemoHealth, demoHealthApi } from "../../../modules/health/src/demo.ts";
+import { type DemoBrain, demoBrainApi } from "../../brain/demo.ts";
 import { demoAlfred } from "../../alfred/demo.ts";
 
 export const DEMO_HOUSEHOLD: Household = parseHousehold(config);
@@ -88,9 +90,10 @@ export async function demoApi(req: Request, url: URL, person: Person, write: boo
   }
   if (get && p === "/api/ha") return json({ ts: Date.now(), fresh: true, error: null, ...home, $comment: undefined });
   if (get && p === "/api/lists") return json({ lists: demoLists(person) });
-  // the data modules answer from their own made-up records, read-only (modules/<name>/src/demo.ts)
+  // the data modules answer from their own made-up records, read-only (modules/<name>/src/demo.ts, apps/brain/demo.ts)
   if (p.startsWith("/api/health/")) return demoHealthApi(req, url, DEMO_HOUSEHOLD, person, health as DemoHealth, today(DEMO_HOUSEHOLD));
   if (p.startsWith("/api/finance/")) return demoFinanceApi(req, url, DEMO_HOUSEHOLD, person, finance as unknown as DemoFinance, today(DEMO_HOUSEHOLD));
+  if (p.startsWith("/api/brain/")) return demoBrainApi(req, url, DEMO_HOUSEHOLD, person, brain as DemoBrain, today(DEMO_HOUSEHOLD));
   if (req.method !== "POST" || !write) throw new HttpError(get ? 404 : 403, get ? "not in the demo" : "cross-site or wrong method");
 
   const body: any = await req.json().catch(() => ({}));
