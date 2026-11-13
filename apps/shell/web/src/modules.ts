@@ -17,8 +17,33 @@ export interface UiModule {
   pages: Record<string, Page>;
 }
 
+import { controlsPage, controlsInit, controlsLeave } from "./pages/controls.ts";
+import { haSetupPage, haSetupInit } from "./pages/ha-setup.ts";
+import { energyPage, energyInit, energyLeave } from "./pages/energy.ts";
+import { energySetupPage, energySetupInit } from "./pages/energy-setup.ts";
+import { kioskPage, kioskInit, kioskLeave } from "./pages/kiosk.ts";
+import { wallTabletsPage, wallTabletsInit } from "./pages/wall-tablets.ts";
+import { systemsPage, systemsInit, systemsLeave } from "./pages/systems.ts";
+import { agentsPage, agentsInit, agentsLeave } from "./pages/agents.ts";
+
 export const UI_MODULES: UiModule[] = [
   calendarUi, financeUi, healthUi,
+  { id: "homeAssistant", pages: {
+    "/home/controls": { title: "Lights", view: controlsPage, init: controlsInit, leave: controlsLeave },
+    "/dashboard/home-assistant": { title: "Home Assistant", view: haSetupPage, init: haSetupInit },
+  } },
+  { id: "energy", pages: {
+    "/home/energy": { title: "Energy", view: energyPage, init: energyInit, leave: energyLeave },
+    "/dashboard/energy-setup": { title: "Energy sensors", view: energySetupPage, init: energySetupInit },
+  } },
+  { id: "kiosk", pages: {
+    "/kiosk": { title: "Wall tablet", view: kioskPage, init: kioskInit, leave: kioskLeave },
+    "/dashboard/wall-tablets": { title: "Wall tablets", view: wallTabletsPage, init: wallTabletsInit },
+  } },
+  { id: "edgeAgents", pages: {
+    "/dashboard/systems": { title: "Systems", view: systemsPage, init: systemsInit, leave: systemsLeave },
+    "/dashboard/agents": { title: "Edge agents", view: agentsPage, init: agentsInit, leave: agentsLeave },
+  } },
   { id: "alfred", pages: {
     "/home/assistant": { title: "Assistant", view: assistant, init: assistantInit },
     "/dashboard/alfred": { title: "Assistant settings", view: alfredSettings, init: alfredSettingsInit },

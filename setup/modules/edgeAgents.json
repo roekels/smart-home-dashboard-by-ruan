@@ -1,0 +1,54 @@
+{
+  "module": "edgeAgents",
+  "d1": [
+    {
+      "name": "agents"
+    }
+  ],
+  "shell": {
+    "d1": [
+      {
+        "binding": "AGENTS_DB",
+        "store": "agents",
+        "migrations": "migrations/agents"
+      }
+    ],
+    "crons": [
+      "* * * * *"
+    ]
+  },
+  "gateway": {
+    "services": [
+      {
+        "binding": "DEVICES",
+        "app": "shell",
+        "entrypoint": "Devices"
+      }
+    ]
+  },
+  "secrets": [
+    {
+      "name": "SHELL_COMMAND_SIGNING_KEY",
+      "app": "shell"
+    }
+  ],
+  "publicPaths": [
+    "/devices/mcp*"
+  ],
+  "serviceAuthPaths": [
+    "/api/agents/*"
+  ],
+  "checks": [
+    {
+      "name": "Devices MCP refuses a caller with no token",
+      "path": "/devices/mcp",
+      "method": "POST",
+      "expectStatus": 401
+    },
+    {
+      "name": "The machines' API is closed without a service token",
+      "path": "/api/agents/commands",
+      "expectAccessLogin": true
+    }
+  ]
+}

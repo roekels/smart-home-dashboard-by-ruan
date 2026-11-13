@@ -10,6 +10,8 @@ data: only who is connected (KV), the hashes of API keys and an audit of every c
 |---|---|
 | `/household/mcp` | always there: who lives here (first names), which modules are on, where their MCPs are |
 | `/<module>/mcp` | one per module that is on and built in, for example `/brain/mcp` |
+| `/home/mcp` | with Home Assistant on: the house (scopes `home.read`, `home.control`, `home.lists`, `home.plugs`) |
+| `/devices/mcp` | with edge agents on: your computers (scopes `devices.read`, `devices.control`) |
 | `/oauth/authorize` | the consent page. Behind Cloudflare Access, like the dashboard |
 | `/oauth/token`, `/oauth/register` | the rest of the OAuth server. Called by the AI app, not by a browser |
 | `/.well-known/oauth-authorization-server`, `/.well-known/oauth-protected-resource/<name>/mcp` | discovery |

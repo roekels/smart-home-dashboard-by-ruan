@@ -1,0 +1,20 @@
+{
+  "$comment": "Made-up computers for the Systems and Edge agents pages. Fingerprints are invented.",
+  "machines": [
+    {
+      "id": "ag_family-laptop", "name": "Family laptop", "kind": "mac", "online": true, "pending": false, "days": 38, "agoMin": 0,
+      "fingerprint": "demo-laptop-fingerprint", "allow_ops": ["agent.ping"],
+      "host": { "model": "Laptop 14", "os": "macOS 26.1", "cores": 10, "cpu": 14, "cpuTemp": 46, "mem": 58, "memUsed": 9300000000, "memTotal": 16000000000, "disk": 61, "diskUsed": 305000000000, "diskTotal": 500000000000, "uptime": 412000, "agentVersion": "0.1.0", "topCpu": [{ "name": "Browser", "cpu": 6.1 }, { "name": "Photos", "cpu": 3.4 }, { "name": "Mail", "cpu": 0.8 }] }
+    },
+    {
+      "id": "ag_gaming-pc", "name": "Gaming PC", "kind": "windows", "online": true, "pending": false, "days": 21, "agoMin": 0,
+      "fingerprint": "demo-gaming-fingerprint", "allow_ops": ["agent.ping", "pc.cancel_shutdown", "pc.shutdown"],
+      "host": { "model": "Tower", "os": "Windows 11", "cores": 16, "cpu": 31, "cpuTemp": 58, "mem": 44, "memUsed": 14100000000, "memTotal": 32000000000, "disk": 72, "diskUsed": 720000000000, "diskTotal": 1000000000000, "gpu": 64, "gpuTemp": 67, "uptime": 18400, "agentVersion": "0.1.0", "topCpu": [{ "name": "Game", "cpu": 22.5 }, { "name": "Voice chat", "cpu": 2.2 }] }
+    },
+    {
+      "id": "ag_home-server", "name": "Home server", "kind": "linux", "online": false, "pending": false, "days": 64, "agoMin": 190,
+      "fingerprint": "demo-server-fingerprint", "allow_ops": ["agent.ping", "pc.wake"],
+      "host": { "model": "Mini PC", "os": "Linux 6.12", "cores": 4, "cpu": 4, "cpuTemp": 41, "mem": 37, "memUsed": 2900000000, "memTotal": 8000000000, "disk": 48, "diskUsed": 230000000000, "diskTotal": 480000000000, "uptime": 2380000, "agentVersion": "0.1.0", "topCpu": [{ "name": "Media server", "cpu": 1.9 }] }
+    }
+  ]
+}

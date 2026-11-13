@@ -54,6 +54,14 @@ change something.
 A module adds pages, API routes and Security entries in two places:
 
 1. **Worker:** a `ShellModule` in `src/modules.ts` (`id`, `pages`, `api`, `security`). Add it to `MODULES`.
+   Three optional hooks cover what pages and APIs for people cannot:
+   - `machine(c)` runs before the sign-in, for callers that are not people (a paired wall tablet, an edge agent).
+     It returns a Response after proving the caller itself, or `null` to let the request go on to the sign-in.
+   - `demo(c)` answers one of the module's `/api` routes in demo mode, from memory only.
+   - `scheduled(env, household, now)` runs on every cron tick of the Worker; the module's setup file adds the cron.
+   A module that offers tools to AI apps exports a `WorkerEntrypoint` class from `src/entrypoints.ts`; the gateway
+   binds to it. The Worker's entry file is `src/worker.ts` (it re-exports `src/index.ts` and the entrypoints), so
+   `src/index.ts` stays free of Workers-only imports and runs in plain Node for demo mode and the tests.
 2. **UI:** an entry in `web/src/modules.ts` (`UI_MODULES`) that draws each of its pages.
 
 Both are ignored while the module is off in `household.config.json`. A module's API handler receives the verified

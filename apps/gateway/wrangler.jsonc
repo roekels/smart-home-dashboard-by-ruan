@@ -16,6 +16,8 @@
     "home.example.com/calendar/mcp*",
     "home.example.com/finance/mcp*",
     "home.example.com/health/mcp*",
+    "home.example.com/home/mcp*",
+    "home.example.com/devices/mcp*",
     "home.example.com/oauth/*",
     "home.example.com/.well-known/oauth-*"
   ],

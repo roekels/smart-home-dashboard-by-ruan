@@ -4,3 +4,4 @@
 export { default } from "./index.ts";
 export { Health } from "../../../modules/health/src/entry.ts";
 export { Finance } from "../../../modules/finance/src/entry.ts";
+export { Home, Devices } from "./entrypoints.ts";

@@ -1,0 +1,77 @@
+{
+  "module": "homeAssistant",
+  "d1": [
+    {
+      "name": "home"
+    }
+  ],
+  "shell": {
+    "d1": [
+      {
+        "binding": "HOME_DB",
+        "store": "home",
+        "migrations": "migrations/home"
+      }
+    ]
+  },
+  "gateway": {
+    "services": [
+      {
+        "binding": "HOME",
+        "app": "shell",
+        "entrypoint": "Home"
+      }
+    ]
+  },
+  "secrets": [
+    {
+      "name": "HA_API_LONGLIVED_TOKEN",
+      "app": "shell"
+    },
+    {
+      "name": "HA_TUNNEL_SERVICE_TOKEN_ID",
+      "app": "shell"
+    },
+    {
+      "name": "HA_TUNNEL_SERVICE_TOKEN_KEY",
+      "app": "shell"
+    }
+  ],
+  "hosts": [
+    {
+      "key": "homeAssistant",
+      "label": "ha",
+      "use": "tunnel",
+      "var": {
+        "app": "shell",
+        "name": "HA_URL",
+        "asUrl": true
+      }
+    }
+  ],
+  "serviceTokens": [
+    {
+      "name": "ha-tunnel",
+      "for": "host:homeAssistant",
+      "app": "shell",
+      "idSecret": "HA_TUNNEL_SERVICE_TOKEN_ID",
+      "keySecret": "HA_TUNNEL_SERVICE_TOKEN_KEY"
+    }
+  ],
+  "publicPaths": [
+    "/home/mcp*"
+  ],
+  "checks": [
+    {
+      "name": "Home MCP refuses a caller with no token",
+      "path": "/home/mcp",
+      "method": "POST",
+      "expectStatus": 401
+    },
+    {
+      "name": "Lights page asks for a sign-in",
+      "path": "/home/controls",
+      "expectAccessLogin": true
+    }
+  ]
+}

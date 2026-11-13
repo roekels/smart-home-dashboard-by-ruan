@@ -5,6 +5,7 @@ import type { Env, Principal } from "./env.ts";
 import type { Service } from "./services.ts";
 import { audit } from "./util.ts";
 import { buildHouseholdServer } from "./tools/household.ts";
+import { buildDevicesServer, buildHomeServer } from "./tools/home.ts";
 import { buildCalendarServer } from "./tools/calendar.ts";
 import { buildFinanceServer } from "./tools/finance.ts";
 import { buildHealthServer } from "./tools/health.ts";
@@ -37,4 +38,6 @@ export const SERVERS: Record<string, ServerBuilder> = {
       h: c.h, services: c.services, base: c.base,
       log: (tool, ok, detail) => void audit(c.env, c.ctx, { service: c.service.id, actor: c.principal.actor, via: c.principal.via, tool, ok, detail }),
     }),
+  home: (c) => buildHomeServer(c.principal, { api: c.env.HOME, h: c.h, log: logger(c) }),
+  devices: (c) => buildDevicesServer(c.principal, { api: c.env.DEVICES, h: c.h, log: logger(c) }),
 };
