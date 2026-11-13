@@ -1,0 +1,22 @@
+{
+  "module": "core",
+  "d1": [{ "name": "gateway" }],
+  "kv": [{ "name": "gateway-oauth" }],
+  "workers": [
+    {
+      "app": "gateway",
+      "compatibilityFlags": ["nodejs_compat"],
+      "d1": [{ "binding": "DB", "store": "gateway", "migrations": "migrations" }],
+      "kv": [{ "binding": "OAUTH_KV", "store": "gateway-oauth" }],
+      "crons": ["30 3 * * *"]
+    },
+    { "app": "shell", "build": "npm run build" }
+  ],
+  "publicPaths": ["/login*", "/household/mcp*", "/oauth/token", "/oauth/register", "/oauth/health", "/.well-known/*"],
+  "checks": [
+    { "name": "sign-in page is public", "path": "/login", "expectStatus": 200 },
+    { "name": "pages ask for a sign-in", "path": "/home", "expectAccessLogin": true },
+    { "name": "gateway is up", "path": "/oauth/health", "expectStatus": 200 },
+    { "name": "MCP refuses a caller with no token", "path": "/household/mcp", "method": "POST", "expectStatus": 401 }
+  ]
+}

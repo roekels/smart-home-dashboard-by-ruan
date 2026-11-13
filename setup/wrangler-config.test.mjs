@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { buildPlan } from "./lib/plan.mjs";
 import { loadInputs, outOfDate, render, resourceProblems } from "./wrangler-config.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -42,7 +43,7 @@ test("no secret can end up in a rendered config", () => {
 
 test("bad inputs are refused with every problem named", () => {
   assert.throws(() => render({ config: { ...config, people: [] }, resources }), /1 to 6 people/);
-  assert.throws(() => render({ config, resources: { accessTeam: "Not A Team", accessAud: "x", gateway: {} } }), /accessTeam.*accessAud.*d1DatabaseId.*kvNamespaceId/s);
-  assert.deepEqual(resourceProblems(resources), []);
+  assert.throws(() => render({ config, resources: { accessTeam: "Not A Team", accessAud: "x", gateway: {} } }), /accessTeam.*accessAud.*d1\.gateway.*kv\.gateway-oauth/s);
+  assert.deepEqual(resourceProblems(resources, buildPlan(config)), []);
   assert.ok(loadInputs().config.people.length >= 1);
 });
