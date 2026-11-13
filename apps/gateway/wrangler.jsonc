@@ -13,6 +13,7 @@
   "preview_urls": false,
   "routes": [
     "home.example.com/household/mcp*",
+    "home.example.com/calendar/mcp*",
     "home.example.com/finance/mcp*",
     "home.example.com/health/mcp*",
     "home.example.com/home/mcp*",

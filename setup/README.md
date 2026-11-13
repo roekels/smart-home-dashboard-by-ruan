@@ -70,6 +70,7 @@ all driven by these files, so a module is installed only when its file exists **
   "secrets": [{ "name": "BRAIN_SENSITIVE_ENCRYPTION_KEY", "app": "brain" }],
 
   // Gateway API keys the setup makes for the module: only the hash is stored; the value goes into the named secret.
+  // "{person}" in a scope is filled in for every person of the household: "cal.{person}.read" gives one scope each.
   "gatewayKeys": [{ "name": "alfred", "scopes": ["household.read"], "secret": "ALFRED_GATEWAY_KEY", "app": "alfred" }],
 
   // Extra hostnames next to the dashboard's own. The host is <label>.<parent of the dashboard's domain>

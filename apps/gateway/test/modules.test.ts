@@ -102,3 +102,49 @@ test("finance MCP: tools follow the scopes, admins and keys only, the audit hold
   assert.doesNotMatch(JSON.stringify(admin.log), /Everyday|150000/);
   assert.deepEqual(admin.log[0], ["finance_create", true, "accounts"]);
 });
+
+test("calendar MCP: one scope per calendar and action, tools and calendar choices follow them", async () => {
+  const { calendarService } = await import("../../calendar/src/service.ts");
+  const { forgetDirectory } = await import("../../calendar/src/caldav.ts");
+  const { fakeIcloud, ics } = await import("../../calendar/test/fakes/icloud.ts");
+  const { buildCalendarServer } = await import("../src/tools/calendar.ts");
+  const cfg = { ...example, modules: { ...example.modules, calendar: true } };
+  const h = parseHousehold(cfg);
+  const service = servicesFor(h).find((s) => s.id === "calendar")!;
+  assert.deepEqual(serviceProblems(servicesFor(h)), []);
+  assert.deepEqual(Object.keys(service.scopes), ["alex", "sam", "shared"].flatMap((c) => ["read", "add", "update", "remove"].map((o) => `cal.${c}.${o}`)));
+  assert.deepEqual(service.groups!.map((g) => g.heading), ["Alex's calendar", "Sam's calendar", "Shared calendar"]);
+  assert.ok(SERVERS.calendar);
+
+  forgetDirectory();
+  const cloud = fakeIcloud({ Alex: { A1: ics("A1", "(Dentist)", "20310610T090000Z", "20310610T093000Z") }, Sam: {}, Family: {} });
+  const calendar = calendarService({ HOUSEHOLD: JSON.stringify(cfg), CALENDAR_ICLOUD_USER_ID: "someone@example.com", CALENDAR_ICLOUD_APP_PASSWORD: "app-pass" }, cloud.fetcher);
+  const as = (scopes: string[]) => connect((log) => buildCalendarServer({ actor: "oauth:Test", via: "oauth", scopes, user: sam.email }, { h, calendar, log: (tool, ok, target) => void log.push([tool, ok, target]) }));
+
+  const reader = await as(["cal.alex.read"]);
+  const tools = (await reader.client.listTools()).tools;
+  assert.deepEqual(tools.map((t) => t.name), ["calendars", "list_events", "find_events", "get_event"]);
+  assert.ok(tools.every((t) => t.annotations?.readOnlyHint === true));
+  assert.deepEqual((tools.find((t) => t.name === "get_event")!.inputSchema.properties as any).calendar.enum, ["alex"]);
+  const listed = await reader.call("list_events", { from: "2031-06-01", to: "2031-06-30" });
+  assert.deepEqual(listed.json().map((e: any) => [e.title, e.status]), [["Dentist", "idea"]]);
+  assert.equal((await reader.call("list_events", { calendars: ["sam"] })).error, true, "not a calendar this connection may read");
+
+  const full = await as(["cal.alex.read", "cal.alex.update", "cal.shared.add", "cal.shared.remove", "cal.shared.read"]);
+  const all = (await full.client.listTools()).tools;
+  assert.deepEqual(all.map((t) => t.name), ["calendars", "list_events", "find_events", "get_event", "add_event", "update_event", "confirm_event", "remove_event"]);
+  const hints = Object.fromEntries(all.map((t) => [t.name, [t.annotations?.readOnlyHint, t.annotations?.destructiveHint]]));
+  assert.deepEqual([hints.add_event, hints.update_event, hints.confirm_event, hints.remove_event], [[false, false], [false, false], [false, false], [false, true]]);
+  assert.equal((await full.call("add_event", { calendar: "alex", title: "x", start: "2031-06-02" })).error, true, "add is only allowed on the shared calendar");
+  assert.equal((await full.call("confirm_event", { calendar: "alex", uid: "A1" })).json().status, "confirmed");
+  const added = await full.call("add_event", { calendar: "shared", title: "Picnic", start: "2031-06-07T12:00" });
+  assert.equal(added.error, false, added.text);
+  const uid = added.json().uid as string;
+  assert.equal((await full.call("remove_event", { calendar: "shared", uid })).json().would_remove.title, "Picnic");
+  assert.equal((await full.call("remove_event", { calendar: "shared", uid, confirm: true })).json().removed, uid);
+  assert.deepEqual(full.log.at(-1), ["remove_event", true, `shared:${uid}`]);
+  assert.equal(JSON.stringify(full.log).includes("Picnic"), false, "the audit holds no titles");
+
+  const off = await connect((log) => buildCalendarServer({ actor: "k", via: "key", scopes: ["cal.alex.read"] }, { h, calendar: undefined, log: (tool, ok, target) => void log.push([tool, ok, target]) }));
+  assert.match((await off.call("calendars")).text, /not connected/);
+});

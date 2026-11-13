@@ -1,0 +1,21 @@
+{
+  "module": "calendar",
+  "workers": [
+    {
+      "app": "calendar",
+      "compatibilityFlags": ["nodejs_compat", "global_fetch_strictly_public"],
+      "vars": { "CALENDAR_SHARED_NAME": "Family" }
+    }
+  ],
+  "shell": { "services": [{ "binding": "CALENDAR", "app": "calendar", "entrypoint": "CalendarUi" }] },
+  "gateway": { "services": [{ "binding": "CALENDAR", "app": "calendar", "entrypoint": "Calendar" }] },
+  "secrets": [
+    { "name": "CALENDAR_ICLOUD_USER_ID", "app": "calendar" },
+    { "name": "CALENDAR_ICLOUD_APP_PASSWORD", "app": "calendar" }
+  ],
+  "publicPaths": ["/calendar/mcp*"],
+  "checks": [
+    { "name": "Calendar MCP refuses a caller with no token", "path": "/calendar/mcp", "method": "POST", "expectStatus": 401 },
+    { "name": "Calendar API asks for a sign-in", "path": "/api/calendar", "expectAccessLogin": true }
+  ]
+}

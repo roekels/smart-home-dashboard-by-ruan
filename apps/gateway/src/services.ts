@@ -66,9 +66,25 @@ const FINANCE: ServiceDef = {
   }),
 };
 
+/** Scopes are per calendar and per action: cal.<calendar id>.<read|add|update|remove>. A person's calendar has
+ *  their person id; "shared" is the one everyone uses. The same names are checked again in apps/calendar. */
+const CAL_OPS = { read: "see events", add: "add new events", update: "change and confirm events", remove: "remove events" };
+const CALENDAR: ServiceDef = {
+  module: "calendar",
+  path: "/calendar/mcp",
+  build: (h) => {
+    const cals = [...h.people.map((p) => ({ id: p.id as string, name: `${p.name}'s calendar` })), { id: "shared", name: "Shared calendar" }];
+    return {
+      id: "calendar", title: "the calendars", path: "/calendar/mcp", prefix: "cal.",
+      scopes: Object.fromEntries(cals.flatMap((c) => Object.entries(CAL_OPS).map(([o, d]) => [`cal.${c.id}.${o}`, `${c.name}: ${d}`]))),
+      groups: cals.map((c) => ({ heading: c.name, scopes: Object.keys(CAL_OPS).map((o) => `cal.${c.id}.${o}`) })),
+    };
+  },
+};
+
 /** One entry per module MCP. */
 export const MODULE_SERVICES: ServiceDef[] = [
-  FINANCE, HEALTH,
+  CALENDAR, FINANCE, HEALTH,
   {
     module: "homeAssistant", path: "/home/mcp",
     build: () => ({

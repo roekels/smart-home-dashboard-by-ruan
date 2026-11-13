@@ -13,6 +13,7 @@ import { homeAssistant } from "../../../modules/home-assistant/worker.ts";
 import { energy } from "../../../modules/energy/worker.ts";
 import { kiosk } from "../../../modules/kiosk/worker.ts";
 import { edgeAgents } from "../../../modules/edge-agents/worker.ts";
+import { calendarModule } from "../../calendar/shell.ts";
 import { alfredModule } from "../../alfred/shell.ts";
 
 /** Where a page shows up: the Home menu, the Metrics menu, or the Management list on Settings. */
@@ -66,7 +67,7 @@ export interface ShellModule {
 }
 
 /** Modules built into this Worker. A module that is on in the config but missing here is simply not there yet. */
-export const MODULES: ShellModule[] = [financeModule, healthModule, homeAssistant, energy, kiosk, edgeAgents, alfredModule];
+export const MODULES: ShellModule[] = [calendarModule, financeModule, healthModule, homeAssistant, energy, kiosk, edgeAgents, alfredModule];
 
 export const builtModules = (h: Household, modules: ShellModule[] = MODULES): ShellModule[] =>
   modules.filter((m) => h.modules[m.id]);

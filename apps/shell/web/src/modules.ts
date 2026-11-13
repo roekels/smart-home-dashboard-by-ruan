@@ -1,6 +1,7 @@
 // What a module adds to the UI: its pages. The Worker's list (src/modules.ts) says which paths exist and who may
 // open them; this list says what each path draws. To add a module: import its descriptor and add it to UI_MODULES.
 import type { Raw } from "./html.ts";
+import { calendarUi } from "./modules/calendar/page.ts";
 import { financeUi } from "./modules/finance/page.ts";
 import { healthUi } from "./modules/health/page.ts";
 import { assistant, assistantInit } from "./pages/assistant.ts";
@@ -26,7 +27,7 @@ import { systemsPage, systemsInit, systemsLeave } from "./pages/systems.ts";
 import { agentsPage, agentsInit, agentsLeave } from "./pages/agents.ts";
 
 export const UI_MODULES: UiModule[] = [
-  financeUi, healthUi,
+  calendarUi, financeUi, healthUi,
   { id: "homeAssistant", pages: {
     "/home/controls": { title: "Lights", view: controlsPage, init: controlsInit, leave: controlsLeave },
     "/dashboard/home-assistant": { title: "Home Assistant", view: haSetupPage, init: haSetupInit },

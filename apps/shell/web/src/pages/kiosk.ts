@@ -95,7 +95,8 @@ async function loadCalendar(): Promise<void> {
   try {
     const { events } = await api.calendar(ymd(now), ymd(new Date(now.getTime() + 86_400_000)));
     const nowS = `${ymd(now)}T${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    const next: CalendarEvent[] = events.filter((e) => e.all_day ? e.start.slice(0, 10) === ymd(now) : e.end > nowS).sort((a, b) => a.start.localeCompare(b.start)).slice(0, 3);
+    // the wall tablet is a shared screen: only the shared calendar goes on it
+    const next: CalendarEvent[] = events.filter((e) => e.owner === null).filter((e) => e.all_day ? e.start.slice(0, 10) === ymd(now) : e.end > nowS).sort((a, b) => a.start.localeCompare(b.start)).slice(0, 3);
     const st = evStateMap(next);
     mount(box, html`${next.map((e) => evCard(e, st.get(e)))}`);
   } catch { /* no calendar on this tablet: the clock stands alone */ }
