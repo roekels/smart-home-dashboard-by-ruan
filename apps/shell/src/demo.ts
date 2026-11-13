@@ -11,6 +11,7 @@ import calendar from "../../../demo/data/calendar.json" with { type: "json" };
 import home from "../../../demo/data/home.json" with { type: "json" };
 import lists from "../../../demo/data/lists.json" with { type: "json" };
 import health from "../../../demo/data/health.json" with { type: "json" };
+import { demoAlfred } from "../../alfred/demo.ts";
 
 export const DEMO_HOUSEHOLD: Household = parseHousehold(config);
 const COOKIE = "demo-person";
@@ -86,6 +87,8 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 /** Every /api route of demo mode except /api/me and /api/security, which index.ts answers for both modes. */
 export async function demoApi(req: Request, url: URL, person: Person, write: boolean): Promise<Response> {
   const p = url.pathname, get = req.method === "GET";
+  const alfred = await demoAlfred(req, url, person, write);
+  if (alfred) return alfred;
   if (get && p === "/api/calendar") {
     const from = url.searchParams.get("from") ?? "", to = url.searchParams.get("to") ?? "";
     if (!DATE.test(from) || !DATE.test(to)) throw new HttpError(400, "from and to are required, YYYY-MM-DD");

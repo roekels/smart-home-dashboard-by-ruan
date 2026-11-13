@@ -1,0 +1,64 @@
+{
+  "$comment": "Made-up answers for the assistant in demo mode. No model is called: a message is matched against these, top to bottom.",
+  "name": "Alfred",
+  "answers": [
+    {
+      "match": "note|remember|write down|keep in mind",
+      "tools": [{ "name": "brain__search", "label": "Brain · search" }],
+      "text": "I would add this to the Boiler note under Home.",
+      "card": { "name": "brain__edit", "label": "Brain · edit", "input": { "ref": "Home/Boiler", "append": "Serviced today. Next service due in twelve months.", "summary": "Boiler service noted" } },
+      "approved": "Done, the Boiler note now has today's service.",
+      "declined": "All right, I left the note as it was."
+    },
+    {
+      "match": "vaccin|booster|doctor|dentist|health",
+      "tools": [{ "name": "health__list", "label": "Health · list" }],
+      "text": "I will save a dentist check-up for you, today, nothing found.",
+      "card": { "name": "health__add", "label": "Health · add", "input": { "person": "{person}", "type": "visit", "date": "{today}", "data": { "what": "Dentist", "why": "Check-up", "outcome": "All fine" } } },
+      "approved": "Saved in your health records.",
+      "declined": "Okay, nothing was saved."
+    },
+    {
+      "match": "light|lamp|scene|dim|bright",
+      "tools": [{ "name": "home__home_status", "label": "Home · status" }, { "name": "home__set_light", "label": "Home · set light" }],
+      "text": "Done, the lights are set."
+    },
+    {
+      "match": "today|tomorrow|week|calendar|planned",
+      "tools": [{ "name": "calendar__list_events", "label": "Calendar · today and tomorrow" }],
+      "text": "Tomorrow there is football practice at five and, pencilled in, dinner with the neighbours at half past seven."
+    },
+    {
+      "match": "shopping|list|milk|buy",
+      "tools": [{ "name": "home__add_list_item", "label": "Home · add list item" }],
+      "text": "Milk is on the shopping list."
+    },
+    {
+      "match": "energy|solar|power|battery",
+      "tools": [{ "name": "home__home_status", "label": "Home · status" }],
+      "text": "The house is using about 400 watts and the roof is making a little over two kilowatts, so the battery is filling."
+    }
+  ],
+  "fallback": "This is the demo, so I answer from made-up data. On a real dashboard I use the house, the calendars, the notes and, for the person asking, their finance and health records.",
+  "services": [
+    { "id": "brain", "name": "Brain" },
+    { "id": "calendar", "name": "Calendar" },
+    { "id": "finance", "name": "Finance" },
+    { "id": "health", "name": "Health" },
+    { "id": "home", "name": "Home" }
+  ],
+  "traces": [
+    { "minutes_ago": 3, "who": "Alex", "kind": "message", "ask": "turn off the kitchen lights", "setup_ms": 180, "total_ms": 2900, "status": "complete",
+      "context": [{ "source": "home", "ms": 120, "ok": true }],
+      "rounds": [{ "ms": 1600, "input": 310, "output": 62, "cache_read": 9200, "cache_write": 0, "tools": ["home__set_light"], "tools_ms": 520 }, { "ms": 800, "input": 140, "output": 18, "cache_read": 9600, "cache_write": 0, "tools": [], "tools_ms": 0 }],
+      "usage": { "input_tokens": 450, "output_tokens": 80, "cache_read_input_tokens": 18800, "cache_creation_input_tokens": 0 } },
+    { "minutes_ago": 41, "who": "Sam", "kind": "message", "ask": "[health, not traced]", "setup_ms": 150, "total_ms": 3400, "status": "awaiting_approval",
+      "context": [],
+      "rounds": [{ "ms": 3100, "input": 520, "output": 140, "cache_read": 9200, "cache_write": 0, "tools": ["health__list", "health__add"], "tools_ms": 210 }],
+      "usage": { "input_tokens": 520, "output_tokens": 140, "cache_read_input_tokens": 9200, "cache_creation_input_tokens": 0 } },
+    { "minutes_ago": 95, "who": "Robin", "kind": "message", "ask": "what is on tomorrow?", "setup_ms": 1400, "total_ms": 2700, "status": "complete",
+      "context": [{ "source": "calendar", "ms": 1380, "ok": true }],
+      "rounds": [{ "ms": 1300, "input": 620, "output": 41, "cache_read": 9200, "cache_write": 0, "tools": [], "tools_ms": 0 }],
+      "usage": { "input_tokens": 620, "output_tokens": 41, "cache_read_input_tokens": 9200, "cache_creation_input_tokens": 0 } }
+  ]
+}

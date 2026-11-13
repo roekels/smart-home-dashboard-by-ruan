@@ -12,6 +12,8 @@ export interface Env {
   DEMO_MODE?: string;
   /** Secret, during setup only: the key page's pass (setup-keys.ts). Set by setup/keys.mjs, deleted by the page. */
   SETUP_KEYPAGE_WRITE_TOKEN?: string;
+  /** Service binding to <prefix>-alfred, present only when the alfred module is on (apps/alfred/shell.ts). */
+  ALFRED?: Fetcher;
   /** wrangler dev only (git-ignored .dev.vars): an email from the household config to act as, skipping Access. */
   DEV_EMAIL?: string;
 }

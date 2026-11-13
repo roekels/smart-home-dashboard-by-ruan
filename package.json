@@ -5,10 +5,10 @@
   "license": "MIT",
   "engines": { "node": ">=22.18" },
   "scripts": {
-    "install:apps": "npm ci --prefix apps/shell && npm ci --prefix apps/gateway",
+    "install:apps": "npm ci --prefix apps/shell && npm ci --prefix apps/gateway && npm ci --prefix apps/alfred",
     "demo": "npm run demo --prefix apps/shell",
     "wrangler-config": "node setup/wrangler-config.mjs",
-    "typecheck": "npm run typecheck --prefix apps/shell && npm run typecheck --prefix apps/gateway",
+    "typecheck": "npm run typecheck --prefix apps/shell && npm run typecheck --prefix apps/gateway && npm run typecheck --prefix apps/alfred",
     "check": "npm run check:manifest && npm run check:scrub && node setup/wrangler-config.mjs --check",
     "check:manifest": "node setup/check-manifest.mjs",
     "check:scrub": "node setup/scrub-check.mjs",

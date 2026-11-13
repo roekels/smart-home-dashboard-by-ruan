@@ -1,0 +1,23 @@
+{
+  "name": "alfred",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The optional house assistant Worker: Claude on the household's own API key, with the gateway MCPs as its tools.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc -p . --noEmit",
+    "test": "node --test",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
+    "@modelcontextprotocol/sdk": "^1.32.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261031.1",
+    "typescript": "^6.0.2",
+    "wrangler": "^4.156.0",
+    "zod": "^4.6.7"
+  }
+}
