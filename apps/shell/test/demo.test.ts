@@ -49,6 +49,25 @@ test("demo: the Today cards' data, per person", async () => {
   assert.ok(lists.lists.some((l: any) => l.shared));
   const health = await call("/api/health/mine");
   assert.equal(health.status, 200);
+  const mine: any = await health.json();
+  assert.equal(mine.vaccinations_due[0].overdue, true, "the first person's tetanus shot is overdue in the demo");
+});
+
+test("demo: the Health and Finance pages read made-up records and refuse every change", async () => {
+  const records: any = await (await call("/api/health/records?person=alex")).json();
+  assert.ok(records.records.length > 3);
+  assert.ok(records.records.every((r: any) => /^\d{4}-\d{2}-\d{2}$/.test(r.date)), "relative dates are worked out");
+  const trends: any = await (await call("/api/health/trends?person=alex")).json();
+  assert.ok(trends.series.some((s: any) => s.points.length === 2));
+  assert.equal((await post("/api/health/records", { type: "visit", person: "alex", date: "2026-01-01", data: { what: "GP" } })).status, 403);
+
+  const over: any = await (await call("/api/finance/overview")).json();
+  assert.equal(over.base, "GBP");
+  assert.ok(over.totals.net > 0 && over.unconverted === 0);
+  assert.ok(over.upcoming.length > 0);
+  const history: any = await (await call("/api/finance/history")).json();
+  assert.ok(history.points.length > 12);
+  assert.equal((await post("/api/finance/accounts", { name: "x", kind: "current", owner: "joint" })).status, 403);
 });
 
 test("demo: lists can be changed in memory, with our header only", async () => {

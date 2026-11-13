@@ -5,6 +5,8 @@ import type { Env, Principal } from "./env.ts";
 import type { Service } from "./services.ts";
 import { audit } from "./util.ts";
 import { buildHouseholdServer } from "./tools/household.ts";
+import { buildFinanceServer } from "./tools/finance.ts";
+import { buildHealthServer } from "./tools/health.ts";
 
 export interface ServerCtx {
   env: Env;
@@ -20,8 +22,14 @@ export interface ServerCtx {
 
 export type ServerBuilder = (c: ServerCtx) => McpServer;
 
-/** Later phases add one line per module MCP, keyed by the service id from services.ts. */
+/** One audit row per tool call: names and ids only. */
+const logger = (c: ServerCtx) => (tool: string, ok: boolean, target?: string | null, detail?: string) =>
+  void audit(c.env, c.ctx, { service: c.service.id, actor: c.principal.actor, via: c.principal.via, tool, target, ok, detail });
+
+/** One line per module MCP, keyed by the service id from services.ts. */
 export const SERVERS: Record<string, ServerBuilder> = {
+  finance: (c) => buildFinanceServer(c.principal, { h: c.h, finance: c.env.FINANCE, log: logger(c) }),
+  health: (c) => buildHealthServer(c.principal, { h: c.h, health: c.env.HEALTH, log: logger(c) }),
   household: (c) =>
     buildHouseholdServer(c.principal, {
       h: c.h, services: c.services, base: c.base,

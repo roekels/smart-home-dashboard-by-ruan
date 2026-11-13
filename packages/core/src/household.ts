@@ -26,6 +26,8 @@ export interface Household {
   resourcePrefix: string;
   language: string;
   timezone: string;
+  /** ISO 4217 code of the currency money is shown in (the Finance module's totals). */
+  currency: string;
   people: Person[];
   modules: Record<ModuleId, boolean>;
   /** Extra hostnames some modules use (a wall tablet host, a tunnel to Home Assistant), by key. Empty = the defaults. */
@@ -44,8 +46,9 @@ const DOMAIN = /^(?=.{4,253}$)[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]
 const PREFIX = /^[a-z][a-z0-9-]{1,15}$/;
 const PERSON_ID = /^[a-z][a-z0-9-]{0,23}$/;
 const EMAIL = /^[^\s@,;<>"]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+const CURRENCY = /^[A-Z]{3}$/;
 const LANGUAGE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/;
-const TOP = ["$schema", "household", "domain", "resourcePrefix", "language", "timezone", "people", "modules", "hosts"];
+const TOP = ["$schema", "household", "domain", "resourcePrefix", "language", "timezone", "currency", "people", "modules", "hosts"];
 const HOST_KEY = /^[a-z][A-Za-z0-9]{0,31}$/;
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -69,6 +72,8 @@ export function householdProblems(input: unknown): string[] {
   if (input.resourcePrefix !== undefined && (typeof input.resourcePrefix !== "string" || !PREFIX.test(input.resourcePrefix))) out.push("resourcePrefix: 2 to 16 characters, lower-case letters, digits and hyphens, starting with a letter");
   if (input.language !== undefined && (typeof input.language !== "string" || !LANGUAGE.test(input.language))) out.push('language: a language tag such as "en" or "de-AT"');
   if (input.timezone !== undefined && (typeof input.timezone !== "string" || !validTimezone(input.timezone))) out.push('timezone: an IANA time zone such as "Europe/London"');
+
+  if (input.currency !== undefined && (typeof input.currency !== "string" || !CURRENCY.test(input.currency))) out.push('currency: a three-letter code such as "EUR", "USD" or "GBP"');
 
   const people = input.people;
   if (!Array.isArray(people) || people.length < 1 || people.length > MAX_PEOPLE) out.push(`people: 1 to ${MAX_PEOPLE} people are required`);
@@ -123,6 +128,7 @@ export function parseHousehold(input: unknown): Household {
     resourcePrefix: c.resourcePrefix ?? "home",
     language: c.language ?? "en",
     timezone: c.timezone ?? "UTC",
+    currency: c.currency ?? "EUR",
     people: c.people.map((p: any) => ({ id: p.id, name: p.name.trim(), email: p.email.trim().toLowerCase(), admin: p.admin === true })),
     modules: Object.fromEntries(MODULE_IDS.map((m) => [m, c.modules[m] === true])) as Record<ModuleId, boolean>,
     hosts: { ...(c.hosts ?? {}) },

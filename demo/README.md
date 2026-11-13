@@ -9,7 +9,8 @@ address ends in `example.com`.
 | `data/calendar.json` | events over the next few days, per person and shared |
 | `data/home.json` | scenes, lights and plugs |
 | `data/lists.json` | a shared shopping list and a to-do list per person |
-| `data/health.json` | what Today's "For you" card shows per person |
+| `data/health.json` | made-up health records per person: the Health page and Today's "For you" card |
+| `data/finance.json` | made-up accounts, balances, contracts and deadlines: the Finance page |
 | `data/alfred.json` | the assistant's canned answers, cards and trace lines |
 
 Run it: `npm run demo` in the repository root, then open the address it prints. In demo mode the dashboard asks for

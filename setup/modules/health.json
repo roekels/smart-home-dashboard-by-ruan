@@ -1,0 +1,16 @@
+{
+  "module": "health",
+  "d1": [{ "name": "health" }],
+  "shell": {
+    "d1": [{ "binding": "HEALTH_DB", "store": "health", "migrations": "../../modules/health/migrations" }]
+  },
+  "gateway": {
+    "services": [{ "binding": "HEALTH", "app": "shell", "entrypoint": "Health" }]
+  },
+  "secrets": [{ "name": "HEALTH_DATA_ENCRYPTION_KEY", "app": "shell" }],
+  "publicPaths": ["/health/mcp*"],
+  "checks": [
+    { "name": "Health MCP refuses a caller with no token", "path": "/health/mcp", "method": "POST", "expectStatus": 401 },
+    { "name": "Health API asks for a sign-in", "path": "/api/health/mine", "expectAccessLogin": true }
+  ]
+}
