@@ -76,7 +76,9 @@ export function workerConfig(plan, w, r) {
     c.migrations = [{ tag: "v1", new_sqlite_classes: w.durableObjects.map((d) => d.className) }];
   }
   if (w.services.length) c.services = w.services.map((s) => ({ binding: s.binding, service: nameOf(s.app), ...(s.entrypoint ? { entrypoint: s.entrypoint } : {}) }));
-  c.vars = { HOUSEHOLD: JSON.stringify(h), ACCESS_TEAM: r.accessTeam, ACCESS_AUD: r.accessAud, ...w.vars };
+  // An application's AUD tag for the Worker that checks it (a module file's serviceAuthPaths entry with audVar).
+  const auds = Object.fromEntries(plan.access.filter((a) => a.audVar?.app === w.app).map((a) => [a.audVar.name, r.aud?.[a.key] ?? "0".repeat(64)]));
+  c.vars = { HOUSEHOLD: JSON.stringify(h), ACCESS_TEAM: r.accessTeam, ACCESS_AUD: r.accessAud, ...auds, ...w.vars };
   if (w.crons.length) c.triggers = { crons: w.crons };
   return c;
 }

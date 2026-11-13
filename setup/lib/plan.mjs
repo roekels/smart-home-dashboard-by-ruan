@@ -68,7 +68,12 @@ export function moduleFileProblems(m, secretNames) {
     if (!SHORT.test(t?.name ?? "") || !SHORT.test(t?.app ?? "") || typeof t?.for !== "string") out.push(`${at}: a service token needs "name", "for" and "app"`);
     for (const n of [t?.idSecret, t?.keySecret]) if (!known(n)) out.push(`${at}: service token secret ${n} is not in secrets.manifest.json`);
   }
-  for (const p of [...(m?.publicPaths ?? []), ...(m?.serviceAuthPaths ?? [])]) if (typeof p !== "string" || !p.startsWith("/")) out.push(`${at}: a path must start with /`);
+  for (const p of m?.publicPaths ?? []) if (typeof p !== "string" || !p.startsWith("/")) out.push(`${at}: a path must start with /`);
+  for (const p of m?.serviceAuthPaths ?? []) {
+    const path = typeof p === "string" ? p : p?.path;
+    if (typeof path !== "string" || !path.startsWith("/")) out.push(`${at}: a path must start with /`);
+    if (typeof p === "object" && p?.audVar && (!SHORT.test(p.audVar.app ?? "") || !BINDING.test(p.audVar.name ?? ""))) out.push(`${at}: audVar needs the "app" and the var "name"`);
+  }
   for (const c of m?.checks ?? []) {
     if (!c?.name || typeof c.path !== "string" || !c.path.startsWith("/")) out.push(`${at}: a check needs a name and a path`);
     if (c?.expectStatus === undefined && !c?.expectAccessLogin) out.push(`${at}: check "${c?.name}" needs expectStatus or expectAccessLogin`);
@@ -131,7 +136,7 @@ export function buildPlan(config, moduleFiles = loadModuleFiles(), secretNames) 
     }
     for (const t of m.serviceTokens ?? []) plan.serviceTokens.push({ module: m.module, ...t, fullName: resourceName(h, t.name) });
     publicPaths.push(...(m.publicPaths ?? []));
-    for (const p of m.serviceAuthPaths ?? []) servicePaths.push({ module: m.module, path: p });
+    for (const p of m.serviceAuthPaths ?? []) servicePaths.push({ module: m.module, ...(typeof p === "string" ? { path: p } : p) });
     for (const c of m.checks ?? []) plan.checks.push({ module: m.module, ...c });
   }
 
@@ -167,9 +172,18 @@ export function buildPlan(config, moduleFiles = loadModuleFiles(), secretNames) 
     domains: [...new Set(publicPaths)].map((p) => h.domain + p),
     policy: { name: "Machine paths: the Worker checks every request itself", decision: "bypass", include: [{ everyone: {} }] },
   });
-  const serviceOnly = { name: "Service token only", decision: "non_identity", include: [{ any_valid_service_token: {} }] };
-  for (const s of servicePaths) plan.access.push({ key: `path:${s.path}`, name: resourceName(h, `${s.module.toLowerCase()}-machines`), what: "Only a machine holding a service token may call this path.", domains: [h.domain + s.path], policy: serviceOnly });
-  for (const host of plan.hosts.filter((x) => x.use === "tunnel")) plan.access.push({ key: `host:${host.key}`, name: resourceName(h, `${host.key.toLowerCase()}-tunnel`), what: "Only the dashboard, holding a service token, may reach this tunnel.", domains: [host.host], policy: serviceOnly });
+  // Machines: the policy names the exact service tokens (lib/access.mjs fills them in from the account).
+  const serviceOnly = { name: "Named service tokens only", decision: "non_identity", include: [] };
+  const made = (key) => plan.serviceTokens.filter((t) => t.for === key).map((t) => t.fullName);
+  for (const s of servicePaths) {
+    const key = `path:${s.path}`;
+    if (s.audVar && !apps.includes(s.audVar.app)) throw new Error(`${s.path}: audVar app "${s.audVar.app}" is not an installed worker`);
+    plan.access.push({ key, name: resourceName(h, `${s.module.toLowerCase()}-machines`), what: "Only a machine holding one of the named service tokens may call this path.", domains: [h.domain + s.path], policy: serviceOnly, tokens: { names: made(key), prefix: resourceName(h, "agent-") }, audVar: s.audVar });
+  }
+  for (const host of plan.hosts.filter((x) => x.use === "tunnel")) {
+    const key = `host:${host.key}`;
+    plan.access.push({ key, name: resourceName(h, `${host.key.toLowerCase()}-tunnel`), what: "Only the dashboard, holding its own service token, may reach this tunnel.", domains: [host.host], policy: serviceOnly, tokens: { names: made(key) } });
+  }
   return plan;
 }
 

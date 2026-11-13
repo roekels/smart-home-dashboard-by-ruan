@@ -74,5 +74,8 @@ household, then run it without `--dry-run`.
 - A module plugs in at fixed places: `apps/shell/src/modules.ts` and `apps/shell/web/src/modules.ts` for its pages
   and API, `apps/gateway/src/services.ts` and `servers.ts` for its MCP. See the README in each folder.
 - Never set `DEMO_MODE` on the person's own dashboard. It is for `npm run demo` and screenshots only.
+- A new computer for the edge agents: the person makes a service token in Cloudflare (Zero Trust, Service
+  credentials) named `<prefix>-agent-<machine>` and keeps both halves in their password manager. Then run
+  `node setup/provision.mjs`, which lets that token, and no other, through to the machines' path.
 - A new secret needs a manifest entry first, named `<MODULE>_<WHAT>_<KIND>`.
 - Health and finance data are never logged, never written to notes, and never sent to another service.

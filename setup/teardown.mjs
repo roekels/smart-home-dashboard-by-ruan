@@ -9,8 +9,8 @@ import { existing, findZone } from "./lib/account.mjs";
 import { buildPlan } from "./lib/plan.mjs";
 import { flag, loadConfig, option, run } from "./lib/io.mjs";
 
-export async function teardown({ cf, config }) {
-  const plan = buildPlan(config);
+export async function teardown({ cf, config, moduleFiles }) {
+  const plan = buildPlan(config, moduleFiles);
   const found = await findZone(cf, plan.household.domain);
   if (!found?.accountId) throw new Error(`no zone for ${plan.household.domain} on this account.`);
   const acct = `/accounts/${found.accountId}`;
@@ -21,8 +21,12 @@ export async function teardown({ cf, config }) {
     catch (e) { if (!(e instanceof CloudflareError)) throw e; actions.push(`could NOT remove ${what}: ${e.message}`); }
   };
   for (const w of plan.workers) await attempt(`Worker ${w.name}`, () => cf.del(`${acct}/workers/scripts/${w.name}`));
-  const tokens = plan.serviceTokens.length ? await cf.list(`${acct}/access/service_tokens`) : [];
-  for (const t of plan.serviceTokens) { const tok = tokens.find((x) => x.name === t.fullName); if (tok) await attempt(`service token ${t.fullName}`, () => cf.del(`${acct}/access/service_tokens/${tok.id}`)); }
+  // The service tokens the setup made, and the machines' own (<prefix>-agent-<machine>).
+  const wanted = plan.access.filter((a) => a.tokens);
+  const tokens = wanted.length ? await cf.list(`${acct}/access/service_tokens`) : [];
+  for (const tok of tokens.filter((t) => wanted.some((a) => a.tokens.names.includes(t.name) || (a.tokens.prefix && t.name.startsWith(a.tokens.prefix))))) {
+    await attempt(`service token ${tok.name}`, () => cf.del(`${acct}/access/service_tokens/${tok.id}`));
+  }
   for (const a of plan.access) { const app = have.apps.get(a.name); if (app) await attempt(`Access application ${a.name}`, () => cf.del(`${acct}/access/apps/${app.id}`)); }
   for (const d of plan.d1) { const id = have.d1.get(d.name); if (id) await attempt(`database ${d.name} and all its data`, () => cf.del(`${acct}/d1/database/${id}`)); }
   for (const k of plan.kv) { const id = have.kv.get(k.name); if (id) await attempt(`KV store ${k.name}`, () => cf.del(`${acct}/storage/kv/namespaces/${id}`)); }
