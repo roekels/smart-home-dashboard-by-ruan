@@ -11,7 +11,7 @@
  *        read-only                      runs
  *        a house action (service home)  runs: a light or a scene is quick to undo
  *        any other write                needs a yes on a card
- *        destructive                    off
+ *        destructive, or named archive / delete / remove   off
  * ALFRED_TOOL_POLICY can change one tool's mode, but a destructive tool never runs without a card.
  */
 import { type Settings, DEFAULT_SETTINGS, allowed } from "./settings.ts";
@@ -30,6 +30,10 @@ export interface ToolInfo {
 /** Services whose ordinary writes run without a card. */
 const AUTO_WRITE_SERVICES = new Set(["home"]);
 
+/** A tool that archives, deletes or removes is treated as destructive whatever its annotations say: hiding a
+ *  record is not something a chat should do in passing. An override can raise it to "confirm". */
+const REMOVES = /(^|_)(archive|delete|remove|purge|erase)(_|$)/;
+
 export const qualified = (t: Pick<ToolInfo, "server" | "name">): string => `${t.server}__${t.name}`;
 
 export function parseOverrides(raw: string | undefined): Record<string, Mode> {
@@ -47,7 +51,7 @@ export function parseOverrides(raw: string | undefined): Record<string, Mode> {
 export function modeFor(t: ToolInfo, overrides: Record<string, Mode> = {}, settings: Settings = DEFAULT_SETTINGS): Mode {
   if (!allowed(settings, t.server, t.readOnly ? "read" : "write")) return "off";
   const q = qualified(t);
-  const destructive = t.destructive && !t.readOnly;
+  const destructive = (t.destructive || REMOVES.test(t.name)) && !t.readOnly;
   if (overrides[q]) return destructive && overrides[q] === "auto" ? "confirm" : overrides[q];
   if (destructive) return "off";
   if (t.readOnly || AUTO_WRITE_SERVICES.has(t.server)) return "auto";

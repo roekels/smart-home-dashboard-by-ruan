@@ -158,6 +158,12 @@ test("policy: reads run, writes ask, destructive tools are off, house actions ru
   assert.equal(modeFor(t("brain", "archive", false, true)), "off");
   assert.equal(modeFor(t("home", "set_light")), "auto");
   assert.equal(modeFor(t("home", "set_plug", false, true)), "off");
+  // a tool that archives or deletes stays off even when its annotations call it harmless
+  assert.equal(modeFor(t("health", "health_archive")), "off");
+  assert.equal(modeFor(t("finance", "finance_archive")), "off");
+  assert.equal(modeFor(t("home", "remove_list_item")), "off");
+  assert.equal(modeFor(t("health", "health_archive"), { health__health_archive: "auto" }), "confirm");
+  assert.equal(modeFor(t("brain", "search_archived", true)), "auto");
   assert.equal(modeFor(t("devices", "run_command", false, true)), "off");
   assert.equal(modeFor(t("some-new-module", "write_thing")), "confirm", "a module nobody planned for still asks first");
   // a destructive tool can be switched on, but never without a yes
