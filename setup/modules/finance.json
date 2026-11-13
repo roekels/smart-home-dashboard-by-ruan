@@ -1,0 +1,17 @@
+{
+  "module": "finance",
+  "d1": [{ "name": "finance" }],
+  "shell": {
+    "d1": [{ "binding": "FINANCE_DB", "store": "finance", "migrations": "../../modules/finance/migrations" }],
+    "crons": ["20 4 * * *"]
+  },
+  "gateway": {
+    "services": [{ "binding": "FINANCE", "app": "shell", "entrypoint": "Finance" }]
+  },
+  "secrets": [{ "name": "FINANCE_DATA_ENCRYPTION_KEY", "app": "shell" }],
+  "publicPaths": ["/finance/mcp*"],
+  "checks": [
+    { "name": "Finance MCP refuses a caller with no token", "path": "/finance/mcp", "method": "POST", "expectStatus": 401 },
+    { "name": "Finance API asks for a sign-in", "path": "/api/finance/overview", "expectAccessLogin": true }
+  ]
+}

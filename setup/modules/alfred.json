@@ -25,7 +25,7 @@
   "gatewayKeys": [
     {
       "name": "alfred",
-      "scopes": ["household.read", "home.read", "home.control", "home.lists"],
+      "scopes": ["household.read", "home.read", "home.control", "home.lists", "finance.read", "finance.write", "health.read", "health.write"],
       "secret": "ALFRED_GATEWAY_KEY",
       "app": "alfred"
     }

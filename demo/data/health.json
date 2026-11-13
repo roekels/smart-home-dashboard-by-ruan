@@ -1,15 +1,27 @@
 {
-  "$comment": "Made-up health reminders per person id: what Today's 'For you' card shows. in_days = days from today (negative = overdue).",
-  "mine": {
-    "alex": {
-      "vaccinations_due": [{ "id": "hx_demo1", "for": "Tetanus", "in_days": -40 }],
-      "current_meds": [{ "id": "hm_demo1", "name": "Vitamin D", "dose": "1 tablet", "schedule": "daily" }],
-      "follow_ups": [{ "id": "hv_demo1", "what": "Dentist", "days_ago": 12, "follow_up": "Book the hygienist" }]
-    },
-    "sam": {
-      "vaccinations_due": [{ "id": "hx_demo2", "for": "Flu", "in_days": 21 }],
-      "current_meds": [],
-      "follow_ups": []
-    }
-  }
+  "$comment": "Made-up health records per person id, for the Health page and Today's 'For you' card. A value written \"@-40\" is a date: 40 days before today (\"@21\" = in 21 days), so the demo never goes stale.",
+  "records": [
+    { "id": "hx_demo1", "person": "alex", "type": "vaccination", "date": "@-3690", "data": { "for": "Tetanus", "vaccine": "Combined booster", "due": "@-40", "given_by": "Family doctor" } },
+    { "id": "hx_demo3", "person": "alex", "type": "vaccination", "date": "@-300", "data": { "for": "Flu", "vaccine": "Seasonal", "due": "@65" } },
+    { "id": "hm_demo1", "person": "alex", "type": "medication", "date": "@-200", "data": { "name": "Vitamin D", "for": "Low level in winter", "dose": "1 tablet", "schedule": "daily", "effects": "No side effects noticed" } },
+    { "id": "hm_demo2", "person": "alex", "type": "medication", "date": "@-90", "data": { "name": "Antihistamine", "for": "Hay fever", "dose": "1 tablet", "schedule": "as needed", "until": "@-30" } },
+    { "id": "hv_demo1", "person": "alex", "type": "visit", "date": "@-12", "data": { "what": "Dentist", "who": "Maple Street Dental", "why": "Check-up", "outcome": "All fine, one small filling watched", "follow_up": "Book the hygienist" } },
+    { "id": "hv_demo2", "person": "alex", "type": "visit", "date": "@-150", "data": { "what": "GP", "who": "Riverside Practice", "why": "Sore back after gardening", "outcome": "Muscle strain", "meds": [{ "name": "Rest and stretching" }], "healthy_on": "@-135" } },
+    { "id": "ht_demo2", "person": "alex", "type": "test", "date": "@-60", "data": { "kind": "blood", "title": "Yearly blood count", "lab": "City Lab", "results": [
+      { "group": "Blood", "name": "Haemoglobin", "value": "15.1", "unit": "g/dl", "low": 13.5, "high": 17.5 },
+      { "group": "Blood", "name": "White cells", "value": "6.2", "unit": "10^9/l", "low": 4, "high": 10 },
+      { "group": "Lipids", "name": "Cholesterol", "value": "212", "unit": "mg/dl", "high": 200 },
+      { "group": "Lipids", "name": "Triglycerides", "value": "140", "unit": "mg/dl", "high": 150 },
+      { "group": "Vitamins", "name": "Vitamin D", "value": "34", "unit": "ng/ml", "low": 30, "high": 100 }] } },
+    { "id": "ht_demo1", "person": "alex", "type": "test", "date": "@-430", "data": { "kind": "blood", "title": "Yearly blood count", "lab": "City Lab", "results": [
+      { "group": "Blood", "name": "Haemoglobin", "value": "14.8", "unit": "g/dl", "low": 13.5, "high": 17.5 },
+      { "group": "Blood", "name": "White cells", "value": "5.8", "unit": "10^9/l", "low": 4, "high": 10 },
+      { "group": "Lipids", "name": "Cholesterol", "value": "195", "unit": "mg/dl", "high": 200 },
+      { "group": "Lipids", "name": "Triglycerides", "value": "120", "unit": "mg/dl", "high": 150 },
+      { "group": "Vitamins", "name": "Vitamin D", "value": "22", "unit": "ng/ml", "low": 30, "high": 100 }] } },
+    { "id": "hx_demo2", "person": "sam", "type": "vaccination", "date": "@-344", "data": { "for": "Flu", "vaccine": "Seasonal", "due": "@21" } },
+    { "id": "hv_demo3", "person": "sam", "type": "visit", "date": "@-200", "data": { "what": "Optician", "who": "Clear View", "why": "Eye test", "outcome": "New reading glasses" } },
+    { "id": "hx_demo4", "person": "robin", "type": "vaccination", "date": "@-700", "data": { "for": "Tetanus", "vaccine": "Combined booster", "due": "@2950" } },
+    { "id": "hv_demo4", "person": "kit", "type": "visit", "date": "@-45", "data": { "what": "Dentist", "who": "Maple Street Dental", "why": "Check-up", "outcome": "All fine" } }
+  ]
 }

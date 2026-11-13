@@ -118,4 +118,14 @@ export default {
       return json({ error: "internal error" }, 500);
     }
   },
+  /** The daily cron: each module that is on does its housekeeping (modules.ts `scheduled`). Never in demo mode. */
+  async scheduled(_event: ScheduledController, env: Env): Promise<void> {
+    if (isDemo(env)) return;
+    const h = householdFromVar(env.HOUSEHOLD);
+    for (const m of builtModules(h)) {
+      if (!m.scheduled) continue;
+      // the module's name only: an error message could carry data
+      await m.scheduled(env, h).catch(() => console.error(`scheduled: ${m.id} failed`));
+    }
+  },
 } satisfies ExportedHandler<Env>;

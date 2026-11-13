@@ -34,7 +34,9 @@ const calendar: ServiceDef = {
     groups: h.people.map((p) => ({ heading: p.name, scopes: [`cal.${p.id}.read`] })),
   }),
 };
-const DEFS = [...SERVICE_DEFS, brain, calendar];
+/** The core MCP plus the made-up ones: these tests are about the registry's rules, not about the real modules. */
+const CORE = SERVICE_DEFS.filter((d) => d.module === "core");
+const DEFS = [...CORE, brain, calendar];
 const withCalendar = parseHousehold({ ...example, modules: { ...example.modules, calendar: true } });
 
 test("services: the core MCP always, a module's MCP only when the module is on", () => {
@@ -89,8 +91,9 @@ test("scopes: each MCP sees only its own; key-only scopes never travel over OAut
 });
 
 test("routes: one per MCP plus the OAuth paths, on the household's domain", () => {
-  assert.deepEqual(routePatterns("home.example.com"), ["home.example.com/household/mcp*", "home.example.com/oauth/*", "home.example.com/.well-known/oauth-*"]);
+  assert.deepEqual(routePatterns("home.example.com", CORE), ["home.example.com/household/mcp*", "home.example.com/oauth/*", "home.example.com/.well-known/oauth-*"]);
   assert.ok(routePatterns("home.example.com", DEFS).includes("home.example.com/brain/mcp*"));
+  for (const d of SERVICE_DEFS) assert.ok(routePatterns("home.example.com").includes(`home.example.com${d.path}*`), d.path);
 });
 
 test("clients: only the listed AI apps and loopback may receive access", () => {

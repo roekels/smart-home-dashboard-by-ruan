@@ -1,4 +1,11 @@
+import type { FinanceApi } from "../../../modules/finance/src/contract.ts";
+import type { HealthApi } from "../../../modules/health/src/contract.ts";
+
 export interface Env {
+  /** <prefix>-shell, entrypoint Finance: the sealed finance records behind /finance/mcp. Unset while the module is off. */
+  FINANCE?: FinanceApi;
+  /** <prefix>-shell, entrypoint Health: the sealed health records behind /health/mcp. Unset while the module is off. */
+  HEALTH?: HealthApi;
   /** D1 <prefix>-gateway: API key hashes and the connection audit. */
   DB: D1Database;
   /** OAuth grants, tokens and clients for every MCP on the host. */

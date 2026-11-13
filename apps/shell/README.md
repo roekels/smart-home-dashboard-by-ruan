@@ -72,6 +72,8 @@ Today shows a card only when its module answers. These are the contracts (the de
 | `GET /api/lists` | homeAssistant | `{ lists: [{ entity, name, shared, items: [{ uid, text, done }] }] }`, only the lists this person may see |
 | `POST /api/lists/add` `{ list, text }`, `POST /api/lists/done` `{ list, item, done }` | homeAssistant | `{ ok: true }` |
 | `GET /api/health/mine` | health | this person's own reminders only: overdue vaccinations, follow-ups, current medication |
+| `/api/health/*` | health | the Health page: see [modules/health](../../modules/health/README.md) |
+| `/api/finance/*` | finance | the Finance page, admins only: see [modules/finance](../../modules/finance/README.md) |
 
 ## Demo mode
 

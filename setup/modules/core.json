@@ -10,7 +10,7 @@
       "kv": [{ "binding": "OAUTH_KV", "store": "gateway-oauth" }],
       "crons": ["30 3 * * *"]
     },
-    { "app": "shell", "build": "npm run build" }
+    { "app": "shell", "main": "src/worker.ts", "build": "npm run build" }
   ],
   "publicPaths": ["/login*", "/household/mcp*", "/oauth/token", "/oauth/register", "/oauth/health", "/.well-known/*"],
   "checks": [

@@ -1,0 +1,57 @@
+{
+  "$comment": "Made-up money records for the Finance page. Amounts are cents. \"@-40\" is a date 40 days before today. `value` is today's balance; `monthly` is how much it changed per month, so the demo can draw two years of history.",
+  "rates": { "GBP": 0.86, "USD": 1.09 },
+  "institutions": [
+    { "id": "in_demo1", "name": "Harbour Bank", "kind": "bank", "country": "GB" },
+    { "id": "in_demo2", "name": "Northlight Invest", "kind": "broker", "country": "GB" },
+    { "id": "in_demo3", "name": "Oakshield Insurance", "kind": "insurer", "country": "GB" }
+  ],
+  "assets": [
+    { "id": "as_demo1", "name": "Maple Street house", "kind": "property", "role": "owned_home", "owner": "joint", "acquired": "@-2300", "price_cents": 31000000, "currency": "GBP", "details": { "m2": 112, "rooms": 5 }, "value": 36500000, "monthly": 90000 },
+    { "id": "as_demo2", "name": "Family car", "kind": "vehicle", "role": "owned", "owner": "joint", "acquired": "@-900", "price_cents": 2400000, "currency": "GBP", "details": { "km": 41200, "fuel": "electric" }, "value": 1650000, "monthly": -22000 }
+  ],
+  "accounts": [
+    { "id": "ac_demo1", "name": "Everyday account", "kind": "current", "institution_id": "in_demo1", "owner": "joint", "currency": "GBP", "last4": "0000", "value": 384000, "monthly": 3000 },
+    { "id": "ac_demo2", "name": "Rainy day savings", "kind": "savings", "institution_id": "in_demo1", "owner": "joint", "currency": "GBP", "value": 1850000, "monthly": 35000 },
+    { "id": "ac_demo3", "name": "Alex's savings", "kind": "high_yield", "institution_id": "in_demo1", "owner": "alex", "currency": "GBP", "value": 920000, "monthly": 20000 },
+    { "id": "ac_demo4", "name": "Dollar account", "kind": "savings", "owner": "sam", "currency": "USD", "value": 640000, "monthly": 8000 },
+    { "id": "ac_demo5", "name": "Investment account", "kind": "brokerage", "institution_id": "in_demo2", "owner": "sam", "currency": "GBP" },
+    { "id": "ac_demo6", "name": "House loan", "kind": "loan", "institution_id": "in_demo1", "owner": "joint", "currency": "GBP", "asset_id": "as_demo1", "value": 21400000, "monthly": -62000 },
+    { "id": "ac_demo7", "name": "Credit card", "kind": "credit_card", "institution_id": "in_demo1", "owner": "alex", "currency": "GBP", "last4": "0000", "value": 43000, "monthly": 0 }
+  ],
+  "holdings": [
+    { "id": "ho_demo1", "account_id": "ac_demo5", "name": "World index fund", "kind": "etf", "symbol": "WORLD", "owner": "sam", "currency": "GBP", "value": 2260000, "monthly": 48000 },
+    { "id": "ho_demo2", "account_id": "ac_demo5", "name": "Green energy fund", "kind": "fund", "symbol": "GREEN", "owner": "sam", "currency": "GBP", "value": 540000, "monthly": 9000 }
+  ],
+  "contracts": [
+    { "id": "co_demo1", "name": "Car insurance", "kind": "insurance", "institution_id": "in_demo3", "asset_id": "as_demo2", "owner": "joint", "starts": "@-320", "renews": "auto", "notice_days": 30, "amount_cents": 61000, "currency": "GBP", "every": "year" },
+    { "id": "co_demo2", "name": "Home insurance", "kind": "insurance", "institution_id": "in_demo3", "asset_id": "as_demo1", "owner": "joint", "starts": "@-275", "renews": "auto", "notice_days": 30, "amount_cents": 38000, "currency": "GBP", "every": "year" },
+    { "id": "co_demo3", "name": "Streaming", "kind": "subscription", "owner": "joint", "amount_cents": 1299, "currency": "GBP", "every": "month", "renews": "auto", "starts": "@-600" }
+  ],
+  "deadlines": [
+    { "id": "dl_demo1", "title": "Car inspection", "due": "@24", "kind": "inspection", "asset_id": "as_demo2", "repeat": "year" },
+    { "id": "dl_demo2", "title": "Tax return", "due": "@70", "kind": "tax", "repeat": "year" },
+    { "id": "dl_demo3", "title": "Boiler service", "due": "@-5", "kind": "service", "asset_id": "as_demo1", "repeat": "year", "amount_cents": 9500, "currency": "GBP" }
+  ],
+  "asset_events": [
+    { "id": "ev_demo1", "asset_id": "as_demo2", "date": "@-200", "kind": "tyres", "title": "Change to summer tyres", "odometer_km": 33800, "tyre_set": "summer", "tread_mm": 5.5, "tread_fl": 5.5, "tread_fr": 5.8, "tread_rl": 6.1, "tread_rr": 6 },
+    { "id": "ev_demo2", "asset_id": "as_demo2", "date": "@-20", "kind": "tyres", "title": "Change to winter tyres", "odometer_km": 41200, "tyre_set": "winter", "tread_mm": 6.8, "tread_fl": 6.8, "tread_fr": 7, "tread_rl": 7.2, "tread_rr": 7.1 },
+    { "id": "ev_demo3", "asset_id": "as_demo2", "date": "@-340", "kind": "service", "title": "Yearly service", "odometer_km": 29500 },
+    { "id": "ev_demo4", "asset_id": "as_demo1", "date": "@-120", "kind": "repair", "title": "Gutter repaired" },
+    { "id": "ev_demo5", "asset_id": "as_demo1", "date": "@-400", "kind": "renovation", "title": "Kitchen painted" }
+  ],
+  "transactions": [
+    { "id": "tx_demo1", "date": "@-20", "amount_cents": -8000, "currency": "GBP", "category": "car.tyres", "asset_id": "as_demo2", "owner": "joint", "counterparty": "Corner garage", "description": "Tyre change and storage" },
+    { "id": "tx_demo2", "date": "@-34", "amount_cents": -4350, "currency": "GBP", "category": "car.charging", "asset_id": "as_demo2", "owner": "joint", "description": "Public charging" },
+    { "id": "tx_demo3", "date": "@-120", "amount_cents": -24000, "currency": "GBP", "category": "housing.repair", "asset_id": "as_demo1", "owner": "joint", "counterparty": "Roofer", "description": "Gutter repair" },
+    { "id": "tx_demo4", "date": "@-60", "amount_cents": -62000, "currency": "GBP", "category": "housing.loan", "asset_id": "as_demo1", "owner": "joint", "description": "Loan payment" },
+    { "id": "tx_demo5", "date": "@-30", "amount_cents": -62000, "currency": "GBP", "category": "housing.loan", "asset_id": "as_demo1", "owner": "joint", "description": "Loan payment" }
+  ],
+  "documents": [
+    { "id": "do_demo1", "title": "Car insurance policy", "kind": "policy", "date": "@-320", "asset_id": "as_demo2", "stored_at": "Folder: Insurance" }
+  ],
+  "tax_years": [
+    { "id": "tax_demo1", "year": 2025, "person": "alex", "kind": "income_tax", "status": "filed" },
+    { "id": "tax_demo2", "year": 2025, "person": "sam", "kind": "income_tax", "status": "open" }
+  ]
+}

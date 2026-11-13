@@ -7,6 +7,8 @@
 import type { Household, ModuleId, Person } from "../../../packages/core/src/household.ts";
 import type { Env } from "./env.ts";
 import type { SecurityPart } from "./security.ts";
+import { financeModule } from "../../../modules/finance/src/shell.ts";
+import { healthModule } from "../../../modules/health/src/shell.ts";
 import { alfredModule } from "../../alfred/shell.ts";
 
 /** Where a page shows up: the Home menu, the Metrics menu, or the Management list on Settings. */
@@ -41,12 +43,14 @@ export interface ShellModule {
   pages?: PageDef[];
   /** API routes by first path segment: { calendar: handler } serves /api/calendar and /api/calendar/*. */
   api?: Record<string, (c: ApiCtx) => Promise<Response>>;
+  /** Runs on the Worker's daily cron while the module is on. A failure is logged by name and stops nothing else. */
+  scheduled?: (env: Env, h: Household) => Promise<void>;
   /** What the Security page shows for this module (security.ts). */
   security?: (h: Household) => SecurityPart;
 }
 
 /** Modules built into this Worker. A module that is on in the config but missing here is simply not there yet. */
-export const MODULES: ShellModule[] = [alfredModule];
+export const MODULES: ShellModule[] = [financeModule, healthModule, alfredModule];
 
 export const builtModules = (h: Household, modules: ShellModule[] = MODULES): ShellModule[] =>
   modules.filter((m) => h.modules[m.id]);

@@ -41,8 +41,33 @@ const CORE: ServiceDef = {
   }),
 };
 
-/** One entry per module MCP. Later phases add brain, calendar, finance, health, home and devices here. */
-export const MODULE_SERVICES: ServiceDef[] = [];
+const HEALTH: ServiceDef = {
+  module: "health",
+  path: "/health/mcp",
+  build: () => ({
+    id: "health", title: "the health records", path: "/health/mcp", prefix: "health.",
+    scopes: {
+      "health.read": "Read doctor visits, test results, vaccinations and medication: your own, or everyone's if you are an admin",
+      "health.write": "Add and change those records, and archive them (nothing is deleted)",
+    },
+  }),
+};
+
+const FINANCE: ServiceDef = {
+  module: "finance",
+  path: "/finance/mcp",
+  build: () => ({
+    id: "finance", title: "the finance records", path: "/finance/mcp", prefix: "finance.",
+    scopes: {
+      "finance.read": "Read accounts, balances, holdings, contracts, transactions and deadlines (admins only)",
+      "finance.write": "Add and change those records",
+      "finance.archive": "Archive a record and bring it back (nothing is deleted)",
+    },
+  }),
+};
+
+/** One entry per module MCP. Other modules (home, devices) add theirs here. */
+export const MODULE_SERVICES: ServiceDef[] = [FINANCE, HEALTH];
 
 export const SERVICE_DEFS: ServiceDef[] = [CORE, ...MODULE_SERVICES];
 
